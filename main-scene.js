@@ -29,7 +29,7 @@ class Assignment_Three_Scene extends Scene_Component
         this.lights = [ new Light( Vec.of( -5,5,5,1 ), Color.of( 0,1,1,1 ), 100000 ) ];
 
         this.king_Fish_Matrix = Mat4.identity(); 
-        //this.king_Fish_Matrix = this.king_Fish_Matrix.times( Mat4.scale([2, .5, 2]));
+        this.king_angle = Math.random();
 
         this.mystery_Fish_Matrix = Mat4.identity(); 
         this.mystery_Fish_Matrix = this.mystery_Fish_Matrix.times( Mat4.translation([0, 2, 0]))
@@ -55,14 +55,26 @@ class Assignment_Three_Scene extends Scene_Component
         this.pond_Matrix = this.pond_Matrix.times( Mat4.translation([0, 0, -1]))
                                            .times( Mat4.scale([10, 10, .01]));  
 
-        //this.rand;            
+        this.pause = true;            
       }
 
     make_control_panel()
       { 
-        //this.key_triggered_button( "Start/Stop Rotation", [ "c" ], this.start_stop );
+        this.key_triggered_button( "Resume/Pause Game", [ "c" ], this.pause_resume );
       }
-
+    
+    pause_resume()
+     {
+        this.pause = !this.pause;   
+     }
+    
+    // Calculate new angle for King of the Pond Fish
+    random_king_angle()
+     {
+        var current_angle = Math.atan2( (this.king_Fish_Matrix[1][3]) , (this.king_Fish_Matrix[0][3]) );
+        this.king_angle = (current_angle + Math.PI) - (0.25 * Math.PI) + (Math.random() * 0.5 * Math.PI);
+     }
+     
     display( graphics_state )
       { 
         graphics_state.lights = this.lights;        
@@ -72,23 +84,26 @@ class Assignment_Three_Scene extends Scene_Component
         
         // Draw flattened blue sphere for temporary pond:
         this.shapes.sphere6.draw( graphics_state, this.pond_Matrix, this.materials.phong);
-        
-        // Variables for calculation of direction for fish:
-        var denominator = Math.floor(t%10) + 1;       
-        var king_Fish_Rad = 2 * Math.PI / denominator;
 
-        // If statement to turn fish if it will translate out of pond; DOES NOT WORK CORRECTLY
-        if(Math.abs(this.king_Fish_Matrix[0][3]) > 6 || Math.abs(this.king_Fish_Matrix[1][3]) > 6)
+        // ***************************** BEGIN KING OF THE POND *****************************
+
+        // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
+        if((Math.abs(this.king_Fish_Matrix[0][3]) > 5.5 || Math.abs(this.king_Fish_Matrix[1][3]) > 5.5) && Math.round( (t % 1.5) * 10) / 10 == 0)
         {
-             king_Fish_Rad += Math.PI, 1000
+             this.random_king_angle();
         }
 
         // Code block to draw King of the Pond fish
-        model_transform = this.king_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(king_Fish_Rad), (0.05) * Math.sin(king_Fish_Rad), 0]));
-        this.king_Fish_Matrix = model_transform;
-        model_transform = model_transform.times( Mat4.rotation( king_Fish_Rad, Vec.of(0, 0, 1)))
-                                         .times( Mat4.scale([2, .5, 2]));
-        this.shapes.plane.draw( graphics_state, model_transform, this.materials.king_Fish);  
+        if(!this.pause)
+        {
+            model_transform = this.king_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(this.king_angle), (0.05) * Math.sin(this.king_angle), 0]));
+            this.king_Fish_Matrix = model_transform;
+            model_transform = model_transform.times( Mat4.rotation( this.king_angle, Vec.of(0, 0, 1)))
+        }
+        model_transform = model_transform.times( Mat4.scale([2, .5, 2]));
+        this.shapes.plane.draw( graphics_state, model_transform, this.materials.king_Fish);
+
+        // ***************************** END KING OF THE POND *****************************  
         
         
         this.shapes.plane.draw( graphics_state, this.mystery_Fish_Matrix,       this.materials.mystery_Fish        );
