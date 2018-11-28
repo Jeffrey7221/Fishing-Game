@@ -10,13 +10,14 @@ class Assignment_Three_Scene extends Scene_Component
         const r = context.width/context.height;
         context.globals.graphics_state.projection_transform = Mat4.perspective( Math.PI/4, r, .1, 1000 );
 
-        const shapes = { box:   new Cube(),
-                         plane: new Square(),
+        const shapes = { box:       new Cube(),
+                         plane:     new Square(),
+                         sphere4:   new Subdivision_Sphere(4),
                        }
         this.submit_shapes( context, shapes );
 
         this.materials =
-          { phong:          context.get_instance( Phong_Shader ).material( Color.of( 1,1,0,1 ) ),
+          { phong:          context.get_instance( Phong_Shader ).material( Color.of( 0,0,1,1 ) ),
             king_Fish:      context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/King_Of_The_Pond.png", false ) } ),
             mystery_Fish:   context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Mystery_Fish.png", false ) } ),
             plain_Fish:     context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Plain_Ol_Fish.png", false ) } ),
@@ -26,9 +27,6 @@ class Assignment_Three_Scene extends Scene_Component
           }
 
         this.lights = [ new Light( Vec.of( -5,5,5,1 ), Color.of( 0,1,1,1 ), 100000 ) ];
-
-        this.isRotating = false; 
-        this.lastt = 0; 
 
         this.king_Fish_Matrix = Mat4.identity(); 
         this.king_Fish_Matrix = this.king_Fish_Matrix.times( Mat4.scale([2, .5, 2]));
@@ -51,24 +49,46 @@ class Assignment_Three_Scene extends Scene_Component
 
         this.nibbler_Matrix = Mat4.identity(); 
         this.nibbler_Matrix = this.nibbler_Matrix.times( Mat4.translation([9, 2, 0]))
-                                                 .times( Mat4.scale([.5, .5, .5]));
-      }
+                                                 .times( Mat4.scale([.5, .5, .5]));         
 
-    start_stop() 
-      { 
-        this.isRotating = !this.isRotating; 
+        this.pond_Matrix = Mat4.identity();
+        this.pond_Matrix = this.pond_Matrix.times( Mat4.translation([0, 0, -1]))
+                                           .times( Mat4.scale([10, 10, .01]));  
+
+        //this.rand;            
       }
 
     make_control_panel()
       { 
-        this.key_triggered_button( "Start/Stop Rotation", [ "c" ], this.start_stop );
+        //this.key_triggered_button( "Start/Stop Rotation", [ "c" ], this.start_stop );
       }
 
     display( graphics_state )
       { graphics_state.lights = this.lights;        
         const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;
         
-        this.shapes.plane.draw( graphics_state, this.king_Fish_Matrix,          this.materials.king_Fish           );
+        let model_transform = Mat4.identity();
+
+        this.shapes.sphere4.draw( graphics_state, this.pond_Matrix, this.materials.phong);
+        
+        var king_Fish_Timer = 0;
+        var denominator = Math.floor(t%10) + 1;
+
+        if( Math.abs((0.5) * t % 100 * Math.cos(king_Fish_Rad)) > 8 ||  Math.abs((0.5) * t % 100 * Math.sin(king_Fish_Rad)) > 8)
+        {
+            denominator = (Math.random() * 11) + 1;
+        }       
+        
+        //if( Math.floor((t % 10) + king_Fish_Timer) > 8)
+        //{   
+            var king_Fish_Rad = 2 * Math.PI / denominator;
+            model_transform = model_transform.times( Mat4.translation([(0.5) * t % 100 * Math.cos(king_Fish_Rad), (0.5) * t % 100 * Math.sin(king_Fish_Rad), 0]));
+            model_transform = model_transform.times( Mat4.rotation( king_Fish_Rad, Vec.of(0, 0, 1)))
+                                             .times( Mat4.scale([2, .5, 2]));
+
+            this.shapes.plane.draw( graphics_state, model_transform, this.materials.king_Fish);  
+        //}
+
         this.shapes.plane.draw( graphics_state, this.mystery_Fish_Matrix,       this.materials.mystery_Fish        );
         this.shapes.plane.draw( graphics_state, this.plain_Fish_Matrix,         this.materials.plain_Fish          );
         this.shapes.plane.draw( graphics_state, this.small_Fry_Matrix,          this.materials.small_Fry           );
