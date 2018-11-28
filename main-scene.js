@@ -12,7 +12,7 @@ class Assignment_Three_Scene extends Scene_Component
 
         const shapes = { box:       new Cube(),
                          plane:     new Square(),
-                         sphere4:   new Subdivision_Sphere(6),
+                         sphere6:   new Subdivision_Sphere(6),
                        }
         this.submit_shapes( context, shapes );
 
@@ -69,26 +69,21 @@ class Assignment_Three_Scene extends Scene_Component
         
         let model_transform = Mat4.identity();
 
-        this.shapes.sphere4.draw( graphics_state, this.pond_Matrix, this.materials.phong);
+        this.shapes.sphere6.draw( graphics_state, this.pond_Matrix, this.materials.phong);
         
-        var king_Fish_Timer = 0;
         var denominator = Math.floor(t%10) + 1;
-
-        if( Math.abs((0.5) * t % 100 * Math.cos(king_Fish_Rad)) > 8 ||  Math.abs((0.5) * t % 100 * Math.sin(king_Fish_Rad)) > 8)
-        {
-            denominator = (Math.random() * 11) + 1;
-        }       
         
-        //if( Math.floor((t % 10) + king_Fish_Timer) > 8)
-        //{   
-            var king_Fish_Rad = 2 * Math.PI / denominator;
-            model_transform = this.king_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(king_Fish_Rad), (0.05) * Math.sin(king_Fish_Rad), 0]));
-            this.king_Fish_Matrix = model_transform;
-            model_transform = model_transform.times( Mat4.rotation( king_Fish_Rad, Vec.of(0, 0, 1)))
-                                             .times( Mat4.scale([2, .5, 2]));
-
-            this.shapes.plane.draw( graphics_state, model_transform, this.materials.king_Fish);  
-        //}
+        var king_Fish_Rad = 2 * Math.PI / denominator;
+        if(Math.abs(this.king_Fish_Matrix[0][3]) > 6 || Math.abs(this.king_Fish_Matrix[1][3]) > 6)
+        {
+             king_Fish_Rad += Math.PI;
+        }
+        model_transform = this.king_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(king_Fish_Rad), (0.05) * Math.sin(king_Fish_Rad), 0]));
+        this.king_Fish_Matrix = model_transform;
+        model_transform = model_transform.times( Mat4.rotation( king_Fish_Rad, Vec.of(0, 0, 1)))
+                                         .times( Mat4.scale([2, .5, 2]));
+        this.shapes.plane.draw( graphics_state, model_transform, this.materials.king_Fish);  
+        
 
         this.shapes.plane.draw( graphics_state, this.mystery_Fish_Matrix,       this.materials.mystery_Fish        );
         this.shapes.plane.draw( graphics_state, this.plain_Fish_Matrix,         this.materials.plain_Fish          );
