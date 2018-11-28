@@ -12,7 +12,7 @@ class Assignment_Three_Scene extends Scene_Component
 
         const shapes = { box:       new Cube(),
                          plane:     new Square(),
-                         sphere4:   new Subdivision_Sphere(4),
+                         sphere4:   new Subdivision_Sphere(6),
                        }
         this.submit_shapes( context, shapes );
 
@@ -29,7 +29,7 @@ class Assignment_Three_Scene extends Scene_Component
         this.lights = [ new Light( Vec.of( -5,5,5,1 ), Color.of( 0,1,1,1 ), 100000 ) ];
 
         this.king_Fish_Matrix = Mat4.identity(); 
-        this.king_Fish_Matrix = this.king_Fish_Matrix.times( Mat4.scale([2, .5, 2]));
+        //this.king_Fish_Matrix = this.king_Fish_Matrix.times( Mat4.scale([2, .5, 2]));
 
         this.mystery_Fish_Matrix = Mat4.identity(); 
         this.mystery_Fish_Matrix = this.mystery_Fish_Matrix.times( Mat4.translation([0, 2, 0]))
@@ -82,7 +82,8 @@ class Assignment_Three_Scene extends Scene_Component
         //if( Math.floor((t % 10) + king_Fish_Timer) > 8)
         //{   
             var king_Fish_Rad = 2 * Math.PI / denominator;
-            model_transform = model_transform.times( Mat4.translation([(0.5) * t % 100 * Math.cos(king_Fish_Rad), (0.5) * t % 100 * Math.sin(king_Fish_Rad), 0]));
+            model_transform = this.king_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(king_Fish_Rad), (0.05) * Math.sin(king_Fish_Rad), 0]));
+            this.king_Fish_Matrix = model_transform;
             model_transform = model_transform.times( Mat4.rotation( king_Fish_Rad, Vec.of(0, 0, 1)))
                                              .times( Mat4.scale([2, .5, 2]));
 
