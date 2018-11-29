@@ -32,7 +32,8 @@ class Fishing_Game extends Scene_Component
         this.king_angle = Math.random() * Math.PI * 2;
 
         this.mystery_Fish_Matrix = Mat4.identity(); 
-        this.mystery_angle = Math.random() * Math.PI * 2;
+        this.mystery_angle = 0; //Math.random() * Math.PI * 2;
+        this.mystery_model_spawn = Mat4.identity().times( Mat4.scale([.2, .05, .2]));
 
         this.plain_Fish_Matrix = Mat4.identity(); 
         this.plain_Fish_Matrix = this.plain_Fish_Matrix.times( Mat4.translation([3, 2, 0]))
@@ -122,14 +123,28 @@ class Fishing_Game extends Scene_Component
         }
 
         // Code block to draw Mystery fish
-        if(!this.pause)
+        if(!this.pause && t > 4.2)
         {
             mystery_model_transform = this.mystery_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(this.mystery_angle), (0.05) * Math.sin(this.mystery_angle), 0]));
             this.mystery_Fish_Matrix = mystery_model_transform;
             mystery_model_transform = mystery_model_transform.times( Mat4.rotation( this.mystery_angle, Vec.of(0, 0, 1)))
+            mystery_model_transform = mystery_model_transform.times( Mat4.scale([2, .5, 2]));
+            this.shapes.plane.draw( graphics_state, mystery_model_transform, this.materials.mystery_Fish);
         }
-        mystery_model_transform = mystery_model_transform.times( Mat4.scale([2, .5, 2]));
-        this.shapes.plane.draw( graphics_state, mystery_model_transform, this.materials.mystery_Fish);
+
+        //mystery_model_transform = mystery_model_transform.times( Mat4.scale([2, .5, 2]));
+        
+        if(t > 4 && t < 4.2)
+        {
+          if(this.mystery_model_spawn[0][0] < 2)
+          {
+              if(Math.round( (t % 0.1) * 10) / 10 == 0)
+              {
+                  this.mystery_model_spawn = this.mystery_model_spawn.times( Mat4.scale([1.4, 1.4, 1.4])); 
+              }
+          }
+          this.shapes.plane.draw( graphics_state, this.mystery_model_spawn, this.materials.mystery_Fish);
+        }     
 
         // ***************************** END MYSTERY FISH *****************************  
 
