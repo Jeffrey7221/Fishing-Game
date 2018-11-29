@@ -145,11 +145,11 @@ class Fishing_Game extends Scene_Component
 
         this.catching = true;
 
-        if(Math.abs((this.king_Fish_Matrix[0][3] + 2 * Math.cos(this.king_angle) - 0.8 * Math.sin(this.king_angle)) - x) < 1 && Math.abs((this.king_Fish_Matrix[1][3] + 0.8 * Math.cos(this.king_angle) + 2 * Math.sin(this.king_angle)) - y) < 1)
+        if(Math.abs((this.king_Fish_Matrix[0][3] + Math.cos(this.king_angle) - 0.3 * Math.sin(this.king_angle)) - x) < 1 && Math.abs((this.king_Fish_Matrix[1][3] + 0.3 * Math.cos(this.king_angle) + Math.sin(this.king_angle)) - y) < 1)
         {
             this.king_caught = true;
         }
-        else if(Math.abs((this.mystery_Fish_Matrix[0][3] + 2 * Math.cos(this.mystery_angle) - 0.5 * Math.sin(this.mystery_angle)) - x) < 1 && Math.abs((this.mystery_Fish_Matrix[1][3] + 0.5 * Math.cos(this.mystery_angle) + 2 * Math.sin(this.mystery_angle)) - y) < 1)
+        else if(Math.abs((this.mystery_Fish_Matrix[0][3] + Math.cos(this.mystery_angle)) - x) < 1 && Math.abs((this.mystery_Fish_Matrix[1][3] + Math.sin(this.mystery_angle)) - y) < 1)
         {
             this.mystery_caught = true;
         }
@@ -260,7 +260,7 @@ class Fishing_Game extends Scene_Component
         if(!this.king_caught)
         {
             // If statement to turn fish if it will translate out of pond
-            if((Math.abs(this.king_Fish_Matrix[0][3] + 2 * Math.cos(this.king_angle) - 0.8 * Math.sin(this.king_angle)) > 5.5 || Math.abs(this.king_Fish_Matrix[1][3] + 0.8 * Math.cos(this.king_angle) + 2 * Math.sin(this.king_angle)) > 5.5) && Math.round( (t % 0.3) * 10) / 10 == 0)
+            if((Math.abs(this.king_Fish_Matrix[0][3] + Math.cos(this.king_angle) - 0.3 * Math.sin(this.king_angle)) > 5.5 || Math.abs(this.king_Fish_Matrix[1][3] + 0.3 * Math.cos(this.king_angle) + Math.sin(this.king_angle)) > 5.5) && Math.round( (t % 0.3) * 10) / 10 == 0)
             {
                 this.random_king_angle();
             }
@@ -309,7 +309,7 @@ class Fishing_Game extends Scene_Component
         if(!this.mystery_caught)
         {
             // If statement to turn fish if it will translate out of pond
-            if((Math.abs(this.mystery_Fish_Matrix[0][3] + 2 * Math.cos(this.mystery_angle) - 0.5 * Math.sin(this.mystery_angle)) > 5.5 || Math.abs(this.mystery_Fish_Matrix[1][3] + 0.5 * Math.cos(this.mystery_angle) + 2 * Math.sin(this.mystery_angle)) > 5.5) && Math.round( (t % 0.5) * 10) / 10 == 0)
+            if((Math.abs(this.mystery_Fish_Matrix[0][3] + Math.cos(this.mystery_angle)) > 5.5 || Math.abs(this.mystery_Fish_Matrix[1][3] + Math.sin(this.mystery_angle)) > 5.5) && Math.round( (t % 0.5) * 10) / 10 == 0)
             {
                 this.random_mystery_angle();
                 this.mystery_direction *= -1;
@@ -350,7 +350,7 @@ class Fishing_Game extends Scene_Component
         let plain_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond
-        if((Math.abs(this.plain_Fish_Matrix[0][3] + .5 * Math.cos(this.plain_angle) -  0.25 * Math.sin(this.plain_angle)) > 6 || Math.abs(this.plain_Fish_Matrix[1][3] + 0.25 * Math.cos(this.plain_angle) + .5 * Math.sin(this.plain_angle)) > 6) && Math.round( (t % 0.5) * 10) / 10 == 0)
+        if((Math.abs(this.plain_Fish_Matrix[0][3] + 0.25 * Math.cos(this.plain_angle)) > 6 || Math.abs(this.plain_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain_angle)) > 6) && Math.round( (t % 0.5) * 10) / 10 == 0)
         {
             this.random_plain_angle();
         }
@@ -384,7 +384,7 @@ class Fishing_Game extends Scene_Component
         let plain1_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond
-        if((Math.abs(this.plain1_Fish_Matrix[0][3] + .5 * Math.cos(this.plain1_angle) -  0.25 * Math.sin(this.plain1_angle)) > 6 || Math.abs(this.plain1_Fish_Matrix[1][3] + 0.25 * Math.cos(this.plain1_angle) + .5 * Math.sin(this.plain1_angle)) > 6) && Math.round( (t % 0.5) * 10) / 10 == 0)
+        if((Math.abs(this.plain1_Fish_Matrix[0][3] + 0.25 * Math.cos(this.plain1_angle)) > 6 || Math.abs(this.plain1_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain1_angle)) > 6) && Math.round( (t % 0.5) * 10) / 10 == 0)
         {
             this.random_plain1_angle();
         }
@@ -418,7 +418,7 @@ class Fishing_Game extends Scene_Component
         let plain2_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond
-        if((Math.abs(this.plain2_Fish_Matrix[0][3] + .5 * Math.cos(this.plain2_angle) -  0.25 * Math.sin(this.plain2_angle)) > 6 || Math.abs(this.plain2_Fish_Matrix[1][3] + 0.25 * Math.cos(this.plain2_angle) + .5 * Math.sin(this.plain2_angle)) > 6) && Math.round( (t % 0.5) * 10) / 10 == 0)
+        if((Math.abs(this.plain2_Fish_Matrix[0][3] + 0.25 * Math.cos(this.plain2_angle)) > 6 || Math.abs(this.plain2_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain2_angle)) > 6) && Math.round( (t % 0.5) * 10) / 10 == 0)
         {
             this.random_plain2_angle();
         }
@@ -452,7 +452,7 @@ class Fishing_Game extends Scene_Component
         let fry_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond
-        if((Math.abs(this.small_Fry_Matrix[0][3] + .3 * Math.cos(this.fry_angle) - 0.15 * Math.sin(this.fry_angle)) > 5 || Math.abs(this.small_Fry_Matrix[1][3] + 0.15 * Math.cos(this.fry_angle) + .3 * Math.sin(this.fry_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
+        if((Math.abs(this.small_Fry_Matrix[0][3] + 0.15 * Math.cos(this.fry_angle)) > 5 || Math.abs(this.small_Fry_Matrix[1][3] + 0.15 * Math.sin(this.fry_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
         {
             this.random_fry_angle();
         }
@@ -497,7 +497,7 @@ class Fishing_Game extends Scene_Component
         let fry1_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond
-        if((Math.abs(this.small_Fry1_Matrix[0][3] + .3 * Math.cos(this.fry1_angle) - 0.15 * Math.sin(this.fry1_angle)) > 5 || Math.abs(this.small_Fry1_Matrix[1][3] + 0.15 * Math.cos(this.fry1_angle) + .3 * Math.sin(this.fry1_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
+        if((Math.abs(this.small_Fry1_Matrix[0][3] + 0.15 * Math.cos(this.fry1_angle)) > 5 || Math.abs(this.small_Fry1_Matrix[1][3] + 0.15 * Math.sin(this.fry1_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
         {
             this.random_fry1_angle();
         }
@@ -542,7 +542,7 @@ class Fishing_Game extends Scene_Component
         let fry2_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond
-        if((Math.abs(this.small_Fry2_Matrix[0][3] + .3 * Math.cos(this.fry2_angle) - 0.15 * Math.sin(this.fry2_angle)) > 5 || Math.abs(this.small_Fry2_Matrix[1][3] + 0.15 * Math.cos(this.fry2_angle) + .3 * Math.sin(this.fry2_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
+        if((Math.abs(this.small_Fry2_Matrix[0][3] + 0.15 * Math.cos(this.fry2_angle)) > 5 || Math.abs(this.small_Fry2_Matrix[1][3] + 0.15 * Math.sin(this.fry2_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
         {
             this.random_fry2_angle();
         }
@@ -576,7 +576,7 @@ class Fishing_Game extends Scene_Component
         let fry3_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond
-        if((Math.abs(this.small_Fry3_Matrix[0][3] + .3 * Math.cos(this.fry3_angle) - 0.15 * Math.sin(this.fry3_angle)) > 5 || Math.abs(this.small_Fry3_Matrix[1][3] + 0.15 * Math.cos(this.fry3_angle) + .3 * Math.sin(this.fry3_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
+        if((Math.abs(this.small_Fry3_Matrix[0][3] + 0.15 * Math.cos(this.fry3_angle)) > 5 || Math.abs(this.small_Fry3_Matrix[1][3] + 0.15 * Math.sin(this.fry3_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
         {
             this.random_fry3_angle();
         }
@@ -610,7 +610,7 @@ class Fishing_Game extends Scene_Component
         let fry4_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond
-        if((Math.abs(this.small_Fry4_Matrix[0][3] + .3 * Math.cos(this.fry4_angle) - 0.15 * Math.sin(this.fry4_angle)) > 5 || Math.abs(this.small_Fry4_Matrix[1][3] + 0.15 * Math.cos(this.fry4_angle) + .3 * Math.sin(this.fry4_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
+        if((Math.abs(this.small_Fry4_Matrix[0][3] + 0.15 * Math.cos(this.fry4_angle)) > 5 || Math.abs(this.small_Fry4_Matrix[1][3] + 0.15 * Math.sin(this.fry4_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
         {
             this.random_fry4_angle();
         }
