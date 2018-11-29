@@ -54,28 +54,17 @@ class Fishing_Game extends Scene_Component
         this.plain2_model_spawn = Mat4.identity().times( Mat4.scale([.005, .005, .005]));
         this.plain2_spawn_time = Math.random() * 3;
 
-        this.small_Fry_Matrix = Mat4.identity().times( Mat4.translation([Math.random() * 2 - 1, Math.random() * 2 - 1, 0.05]));
+        this.small_Fry_Matrix = Mat4.identity();
         this.fry_angle = Math.random() * 2 * Math.PI;
         this.fry_model_spawn = Mat4.identity().times( Mat4.scale([.005, .005, .005]));
         this.fry_spawn_time = Math.random() * 3;
         this.fry_dist = 0.01;
 
-        this.small_Fry1_Matrix = Mat4.identity().times( Mat4.translation([Math.random() * 2 - 1, Math.random() * 2 - 1, 0.05]));
+        this.small_Fry1_Matrix = Mat4.identity();
         this.fry1_angle = Math.random() * 2 * Math.PI;
         this.fry1_model_spawn = Mat4.identity().times( Mat4.scale([.005, .005, .005]));
         this.fry1_spawn_time = Math.random() * 3;
         this.fry1_dist = 0.01;
-
-        this.small_Fry2_Matrix = Mat4.identity().times( Mat4.translation([Math.random() * 2 - 1, Math.random() * 2 - 1, 0.05]));
-        this.fry2_angle = Math.random() * 2 * Math.PI;
-        this.fry2_model_spawn = Mat4.identity().times( Mat4.scale([.005, .005, .005]));
-        this.fry2_spawn_time = Math.random() * 3;
-	
-        this.small_Fry3_Matrix = Mat4.identity().times( Mat4.translation([Math.random() * 2 - 1, Math.random() * 2 - 1, 0.05]));
-        this.fry3_angle = Math.random() * 2 * Math.PI;
-        this.fry3_model_spawn = Mat4.identity().times( Mat4.scale([.005, .005, .005]));
-        this.fry3_spawn_time = Math.random() * 3;
-
 	
         this.touchy_Fish_Matrix = Mat4.identity(); 
         this.touchy_Fish_Matrix = this.touchy_Fish_Matrix.times( Mat4.translation([7, 2, 0]))
@@ -144,19 +133,7 @@ class Fishing_Game extends Scene_Component
       {
          var current_angle = Math.atan2( (this.small_Fry1_Matrix[1][3]) , (this.small_Fry_Matrix[0][3]) );
          this.fry1_angle = (current_angle + Math.PI) - (0.25 * Math.PI) + (Math.random() * 0.5 * Math.PI);
-      } 
-
-    random_fry2_angle()
-      {
-         var current_angle = Math.atan2( (this.small_Fry2_Matrix[1][3]) , (this.small_Fry_Matrix[0][3]) );
-         this.fry2_angle = (current_angle + Math.PI) - (0.25 * Math.PI) + (Math.random() * 0.5 * Math.PI);
-      } 
-
-    random_fry3_angle()
-      {
-         var current_angle = Math.atan2( (this.small_Fry3_Matrix[1][3]) , (this.small_Fry_Matrix[0][3]) );
-         this.fry3_angle = (current_angle + Math.PI) - (0.25 * Math.PI) + (Math.random() * 0.5 * Math.PI);
-      }         
+      }       
 
     // ***************************** END ANGLE HELPER FUNCTIONS ***************************** 
      
@@ -252,7 +229,7 @@ class Fishing_Game extends Scene_Component
         let plain_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
-        if((Math.abs(this.plain_Fish_Matrix[0][3]) > 5 || Math.abs(this.plain_Fish_Matrix[1][3]) > 5) && Math.round( (t % 0.5) * 10) / 10 == 0)
+        if((Math.abs(this.plain_Fish_Matrix[0][3] + .5 * Math.cos(this.plain_angle)) > 5 || Math.abs(this.plain_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain_angle)) > 5) && Math.round( (t % 0.5) * 10) / 10 == 0)
         {
             this.random_plain_angle();
         }
@@ -286,7 +263,7 @@ class Fishing_Game extends Scene_Component
         let plain1_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
-        if((Math.abs(this.plain1_Fish_Matrix[0][3]) > 5 || Math.abs(this.plain1_Fish_Matrix[1][3]) > 5) && Math.round( (t % 0.5) * 10) / 10 == 0)
+        if((Math.abs(this.plain1_Fish_Matrix[0][3] + .5 * Math.cos(this.plain1_angle)) > 5 || Math.abs(this.plain1_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain1_angle)) > 5) && Math.round( (t % 0.5) * 10) / 10 == 0)
         {
             this.random_plain1_angle();
         }
@@ -320,7 +297,7 @@ class Fishing_Game extends Scene_Component
         let plain2_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
-        if((Math.abs(this.plain2_Fish_Matrix[0][3]) > 5 || Math.abs(this.plain2_Fish_Matrix[1][3]) > 5) && Math.round( (t % 0.5) * 10) / 10 == 0)
+        if((Math.abs(this.plain2_Fish_Matrix[0][3] + .5 * Math.cos(this.plain2_angle)) > 5 || Math.abs(this.plain2_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain2_angle)) > 5) && Math.round( (t % 0.5) * 10) / 10 == 0)
         {
             this.random_plain2_angle();
         }
@@ -354,7 +331,7 @@ class Fishing_Game extends Scene_Component
         let fry_model_transform = Mat4.identity();
         
         // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
-        if((Math.abs(this.small_Fry_Matrix[0][3]) > 5 || Math.abs(this.small_Fry_Matrix[1][3]) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
+        if((Math.abs(this.small_Fry_Matrix[0][3] + .3 * Math.cos(this.fry_angle)) > 5 || Math.abs(this.small_Fry_Matrix[1][3] + 0.15 * Math.sin(this.fry_angle)) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
         {
             this.random_fry_angle();
         }
@@ -392,121 +369,7 @@ class Fishing_Game extends Scene_Component
             this.shapes.plane.draw( graphics_state, fry_model_transform, this.materials.small_Fry);
         }      
 
-        // ***************************** END SMALL FRY *****************************
-
-        // ***************************** BEGIN SMALL FRY1 *****************************
-
-        let fry1_model_transform = Mat4.identity();
-        
-        // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
-        if((Math.abs(this.small_Fry1_Matrix[0][3]) > 5 || Math.abs(this.small_Fry1_Matrix[1][3]) > 5) && Math.round( (t % 0.2) * 10) / 10 == 0)
-        {
-            this.random_fry1_angle();
-        }
-        
-        // Code block to draw Plain fish      
-        if(t > this.fry1_spawn_time && t < this.fry1_spawn_time + 0.2)
-        {
-          if(this.fry1_model_spawn[0][0] < .25)
-          {
-              if(Math.round( (t % 0.1) * 10) / 10 == 0)
-              {
-                  this.fry1_model_spawn = this.fry1_model_spawn.times( Mat4.scale([1.1, 1.1, 1.1])); 
-              }
-          }
-          this.shapes.plane.draw( graphics_state, this.fry1_model_spawn, this.materials.small_Fry);
-        }
-
-        if(t > this.fry1_spawn_time + 0.2)
-        {
-            fry1_model_transform = this.small_Fry1_Matrix.times( Mat4.translation([(4 / (t - this.fry1_dist)) * (0.1) * Math.cos(this.fry1_angle), (4 / (t - this.fry1_dist)) * (0.1) * Math.sin(this.fry1_angle), 0]));
-
-            if( 4 / (t - this.fry1_dist) < 0.8)
-            {
-                this.fry1_dist += 4;
-            }
-
-            if( t - this.fry1_dist > 10 )
-            {
-                this.fry1_dist += 9;
-            }
-            
-            this.small_Fry1_Matrix = fry1_model_transform;
-            fry1_model_transform = fry1_model_transform.times( Mat4.rotation( this.fry1_angle, Vec.of(0, 0, 1)))
-            fry1_model_transform = fry1_model_transform.times( Mat4.scale([.3, .3, .3]));
-            this.shapes.plane.draw( graphics_state, fry1_model_transform, this.materials.small_Fry);
-        }      
-
-        // ***************************** END SMALL FRY1 *****************************   
-
-        // ***************************** BEGIN SMALL FRY2 *****************************
-
-        let fry2_model_transform = Mat4.identity();
-        
-        // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
-        if((Math.abs(this.small_Fry2_Matrix[0][3]) > 5 || Math.abs(this.small_Fry2_Matrix[1][3]) > 5) && Math.round( (t % 0.5) * 10) / 10 == 0)
-        {
-            this.random_fry2_angle();
-        }
-        
-        // Code block to draw Plain fish      
-        if(t > this.fry2_spawn_time && t < this.fry2_spawn_time + 0.2)
-        {
-          if(this.fry2_model_spawn[0][0] < .25)
-          {
-              if(Math.round( (t % 0.1) * 10) / 10 == 0)
-              {
-                  this.fry2_model_spawn = this.fry2_model_spawn.times( Mat4.scale([1.1, 1.1, 1.1])); 
-              }
-          }
-          this.shapes.plane.draw( graphics_state, this.fry2_model_spawn, this.materials.small_Fry);
-        }
-
-        if(t > this.fry2_spawn_time + 0.2)
-        {
-            fry2_model_transform = this.small_Fry2_Matrix.times( Mat4.translation([(0.1) * Math.cos(this.fry2_angle), (0.1) * Math.sin(this.fry2_angle), 0]));
-            
-            this.small_Fry2_Matrix = fry2_model_transform;
-            fry2_model_transform = fry2_model_transform.times( Mat4.rotation( this.fry2_angle, Vec.of(0, 0, 1)))
-            fry2_model_transform = fry2_model_transform.times( Mat4.scale([.3, .3, .3]));
-            this.shapes.plane.draw( graphics_state, fry2_model_transform, this.materials.small_Fry);
-        }      
-
-        // ***************************** END SMALL FRY2 *****************************  
-        
-        // ***************************** BEGIN SMALL FRY3 *****************************
-
-        let fry3_model_transform = Mat4.identity();
-        
-        // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
-        if((Math.abs(this.small_Fry3_Matrix[0][3]) > 5 || Math.abs(this.small_Fry3_Matrix[1][3]) > 5) && Math.round( (t % 0.5) * 10) / 10 == 0)
-        {
-            this.random_fry3_angle();
-        }
-        
-        // Code block to draw Plain fish      
-        if(t > this.fry3_spawn_time && t < this.fry3_spawn_time + 0.2)
-        {
-          if(this.fry3_model_spawn[0][0] < .25)
-          {
-              if(Math.round( (t % 0.1) * 10) / 10 == 0)
-              {
-                  this.fry3_model_spawn = this.fry3_model_spawn.times( Mat4.scale([1.1, 1.1, 1.1])); 
-              }
-          }
-          this.shapes.plane.draw( graphics_state, this.fry3_model_spawn, this.materials.small_Fry);
-        }
-
-        if(t > this.fry3_spawn_time + 0.2)
-        {
-            fry3_model_transform = this.small_Fry3_Matrix.times( Mat4.translation([(0.1) * Math.cos(this.fry3_angle), (0.1) * Math.sin(this.fry3_angle), 0]));
-            this.small_Fry3_Matrix = fry3_model_transform;
-            fry3_model_transform = fry3_model_transform.times( Mat4.rotation( this.fry3_angle, Vec.of(0, 0, 1)))
-            fry3_model_transform = fry3_model_transform.times( Mat4.scale([.3, .3, .3]));
-            this.shapes.plane.draw( graphics_state, fry3_model_transform, this.materials.small_Fry);
-        }      
-
-        // ***************************** END SMALL FRY3 *****************************  
+        // ***************************** END SMALL FRY ***************************** 
 
         //this.shapes.plane.draw( graphics_state, this.small_Fry_Matrix,          this.materials.small_Fry           );
         //this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
