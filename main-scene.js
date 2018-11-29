@@ -1,5 +1,5 @@
-window.Assignment_Three_Scene = window.classes.Assignment_Three_Scene =
-class Assignment_Three_Scene extends Scene_Component
+window.Fishing_Game = window.classes.Fishing_Game =
+class Fishing_Game extends Scene_Component
   { constructor( context, control_box )    
       { super(   context, control_box );    
         if( !context.globals.has_controls   ) 
@@ -29,11 +29,10 @@ class Assignment_Three_Scene extends Scene_Component
         this.lights = [ new Light( Vec.of( -5,5,5,1 ), Color.of( 0,1,1,1 ), 100000 ) ];
 
         this.king_Fish_Matrix = Mat4.identity(); 
-        this.king_angle = Math.random();
+        this.king_angle = Math.random() * Math.PI * 2;
 
         this.mystery_Fish_Matrix = Mat4.identity(); 
-        this.mystery_Fish_Matrix = this.mystery_Fish_Matrix.times( Mat4.translation([0, 2, 0]))
-                                                           .times( Mat4.scale([2, .5, 2]));
+        this.mystery_angle = Math.random() * Math.PI * 2;
 
         this.plain_Fish_Matrix = Mat4.identity(); 
         this.plain_Fish_Matrix = this.plain_Fish_Matrix.times( Mat4.translation([3, 2, 0]))
@@ -68,45 +67,72 @@ class Assignment_Three_Scene extends Scene_Component
         this.pause = !this.pause;   
      }
     
-    // Calculate new angle for King of the Pond Fish
     random_king_angle()
      {
         var current_angle = Math.atan2( (this.king_Fish_Matrix[1][3]) , (this.king_Fish_Matrix[0][3]) );
         this.king_angle = (current_angle + Math.PI) - (0.25 * Math.PI) + (Math.random() * 0.5 * Math.PI);
      }
+
+    random_mystery_angle()
+      {
+         var current_angle = Math.atan2( (this.mystery_Fish_Matrix[1][3]) , (this.mystery_Fish_Matrix[0][3]) );
+         this.mystery_angle = (current_angle + Math.PI) - (0.25 * Math.PI) + (Math.random() * 0.5 * Math.PI);
+      }
      
     display( graphics_state )
       { 
         graphics_state.lights = this.lights;        
         const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;
-        
-        let model_transform = Mat4.identity();
-        
+
         // Draw flattened blue sphere for temporary pond:
         this.shapes.sphere6.draw( graphics_state, this.pond_Matrix, this.materials.phong);
 
         // ***************************** BEGIN KING OF THE POND *****************************
+        
+        let king_model_transform = Mat4.identity();
 
         // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
         if((Math.abs(this.king_Fish_Matrix[0][3]) > 5.5 || Math.abs(this.king_Fish_Matrix[1][3]) > 5.5) && Math.round( (t % 1.5) * 10) / 10 == 0)
         {
-             this.random_king_angle();
+            var temp = this.king_Fish_Matrix;
+            this.random_king_angle();
         }
 
         // Code block to draw King of the Pond fish
         if(!this.pause)
         {
-            model_transform = this.king_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(this.king_angle), (0.05) * Math.sin(this.king_angle), 0]));
-            this.king_Fish_Matrix = model_transform;
-            model_transform = model_transform.times( Mat4.rotation( this.king_angle, Vec.of(0, 0, 1)))
+            king_model_transform = this.king_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(this.king_angle), (0.05) * Math.sin(this.king_angle), 0]));
+            this.king_Fish_Matrix = king_model_transform;
+            king_model_transform = king_model_transform.times( Mat4.rotation( this.king_angle, Vec.of(0, 0, 1)))
         }
-        model_transform = model_transform.times( Mat4.scale([2, .5, 2]));
-        this.shapes.plane.draw( graphics_state, model_transform, this.materials.king_Fish);
+        king_model_transform = king_model_transform.times( Mat4.scale([2, .5, 2]));
+        this.shapes.plane.draw( graphics_state, king_model_transform, this.materials.king_Fish);
 
         // ***************************** END KING OF THE POND *****************************  
         
-        
-        this.shapes.plane.draw( graphics_state, this.mystery_Fish_Matrix,       this.materials.mystery_Fish        );
+        // ***************************** BEGIN MYSTERY FISH *****************************
+
+        let mystery_model_transform = Mat4.identity();
+
+        // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
+        if((Math.abs(this.mystery_Fish_Matrix[0][3]) > 5.5 || Math.abs(this.mystery_Fish_Matrix[1][3]) > 5.5) && Math.round( (t % 1.5) * 10) / 10 == 0)
+        {
+            var temp = this.mystery_Fish_Matrix;
+            this.random_mystery_angle();
+        }
+
+        // Code block to draw Mystery fish
+        if(!this.pause)
+        {
+            mystery_model_transform = this.mystery_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(this.mystery_angle), (0.05) * Math.sin(this.mystery_angle), 0]));
+            this.mystery_Fish_Matrix = mystery_model_transform;
+            mystery_model_transform = mystery_model_transform.times( Mat4.rotation( this.mystery_angle, Vec.of(0, 0, 1)))
+        }
+        mystery_model_transform = mystery_model_transform.times( Mat4.scale([2, .5, 2]));
+        this.shapes.plane.draw( graphics_state, mystery_model_transform, this.materials.mystery_Fish);
+
+        // ***************************** END MYSTERY FISH *****************************  
+
         this.shapes.plane.draw( graphics_state, this.plain_Fish_Matrix,         this.materials.plain_Fish          );
         this.shapes.plane.draw( graphics_state, this.small_Fry_Matrix,          this.materials.small_Fry           );
         this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
