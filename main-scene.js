@@ -5,7 +5,7 @@ class Fishing_Game extends Scene_Component
         if( !context.globals.has_controls   ) 
           context.register_scene_component( new Movement_Controls( context, control_box.parentElement.insertCell() ) ); 
 
-        context.globals.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0,0,10 ), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
+        context.globals.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0,0,20 ), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
 
         const r = context.width/context.height;
         context.globals.graphics_state.projection_transform = Mat4.perspective( Math.PI/4, r, .1, 1000 );
@@ -28,12 +28,16 @@ class Fishing_Game extends Scene_Component
 
         this.lights = [ new Light( Vec.of( -5,5,5,1 ), Color.of( 0,1,1,1 ), 100000 ) ];
 
-        this.king_Fish_Matrix = Mat4.identity(); 
-        this.king_angle = Math.random() * Math.PI * 2;
+        this.king_Fish_Matrix = Mat4.identity().times( Mat4.translation([0, 0, -0.15]));  
+        this.king_angle = 0
+        this.king_model_spawn = Mat4.identity().times( Mat4.scale([.2, .05, .2]));
+        this.king_spawn_time = Math.random() * 12 + 1;
+        this.king_dist = 0.01;
 
-        this.mystery_Fish_Matrix = Mat4.identity(); 
-        this.mystery_angle = 0; //Math.random() * Math.PI * 2;
+        this.mystery_Fish_Matrix = Mat4.identity().times( Mat4.translation([0, 0, -0.1])); 
+        this.mystery_angle = 0;
         this.mystery_model_spawn = Mat4.identity().times( Mat4.scale([.2, .05, .2]));
+        this.mystery_spawn_time = Math.random() * 12 + 10;
 
         this.plain_Fish_Matrix = Mat4.identity(); 
         this.plain_Fish_Matrix = this.plain_Fish_Matrix.times( Mat4.translation([3, 2, 0]))
@@ -95,20 +99,42 @@ class Fishing_Game extends Scene_Component
         // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
         if((Math.abs(this.king_Fish_Matrix[0][3]) > 5.5 || Math.abs(this.king_Fish_Matrix[1][3]) > 5.5) && Math.round( (t % 1.5) * 10) / 10 == 0)
         {
-            var temp = this.king_Fish_Matrix;
             this.random_king_angle();
         }
 
-        // Code block to draw King of the Pond fish
-        if(!this.pause)
+        // Code block to draw Mystery fish      
+        if(t > this.king_spawn_time && t < this.king_spawn_time + 0.2)
         {
-            king_model_transform = this.king_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(this.king_angle), (0.05) * Math.sin(this.king_angle), 0]));
+          if(this.king_model_spawn[0][0] < 2)
+          {
+              if(Math.round( (t % 0.1) * 10) / 10 == 0)
+              {
+                  this.king_model_spawn = this.king_model_spawn.times( Mat4.scale([1.4, 1.4, 1.4])); 
+              }
+          }
+          this.shapes.plane.draw( graphics_state, this.king_model_spawn, this.materials.king_Fish);
+        }
+
+        if(t > this.king_spawn_time + 0.2)
+        {
+            king_model_transform = this.king_Fish_Matrix.times( Mat4.translation([(6 / (t - this.king_dist)) * (0.05) * Math.cos(this.king_angle), (6 / (t - this.king_dist)) * (0.05) * Math.sin(this.king_angle), 0]));
+
+            if( 6 / (t - this.king_dist) < 0.6)
+            {
+                this.king_dist += 9;
+            }
+
+            if( t - this.king_dist > 10 )
+            {
+                this.king_dist += 9;
+            }
+
             this.king_Fish_Matrix = king_model_transform;
             king_model_transform = king_model_transform.times( Mat4.rotation( this.king_angle, Vec.of(0, 0, 1)))
-        }
-        king_model_transform = king_model_transform.times( Mat4.scale([2, .5, 2]));
-        this.shapes.plane.draw( graphics_state, king_model_transform, this.materials.king_Fish);
-
+            king_model_transform = king_model_transform.times( Mat4.scale([2, .5, 2]));
+            this.shapes.plane.draw( graphics_state, king_model_transform, this.materials.king_Fish);
+        }     
+   
         // ***************************** END KING OF THE POND *****************************  
         
         // ***************************** BEGIN MYSTERY FISH *****************************
@@ -118,23 +144,11 @@ class Fishing_Game extends Scene_Component
         // If statement to turn fish if it will translate out of pond, needs slight adjustment for detection of pond in certain quadrants
         if((Math.abs(this.mystery_Fish_Matrix[0][3]) > 5.5 || Math.abs(this.mystery_Fish_Matrix[1][3]) > 5.5) && Math.round( (t % 1.5) * 10) / 10 == 0)
         {
-            var temp = this.mystery_Fish_Matrix;
             this.random_mystery_angle();
         }
 
-        // Code block to draw Mystery fish
-        if(!this.pause && t > 4.2)
-        {
-            mystery_model_transform = this.mystery_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(this.mystery_angle), (0.05) * Math.sin(this.mystery_angle), 0]));
-            this.mystery_Fish_Matrix = mystery_model_transform;
-            mystery_model_transform = mystery_model_transform.times( Mat4.rotation( this.mystery_angle, Vec.of(0, 0, 1)))
-            mystery_model_transform = mystery_model_transform.times( Mat4.scale([2, .5, 2]));
-            this.shapes.plane.draw( graphics_state, mystery_model_transform, this.materials.mystery_Fish);
-        }
-
-        //mystery_model_transform = mystery_model_transform.times( Mat4.scale([2, .5, 2]));
-        
-        if(t > 4 && t < 4.2)
+        // Code block to draw Mystery fish      
+        if(t > this.mystery_spawn_time && t < this.mystery_spawn_time + 0.2)
         {
           if(this.mystery_model_spawn[0][0] < 2)
           {
@@ -144,6 +158,15 @@ class Fishing_Game extends Scene_Component
               }
           }
           this.shapes.plane.draw( graphics_state, this.mystery_model_spawn, this.materials.mystery_Fish);
+        }
+
+        if(t > this.mystery_spawn_time + 0.2)
+        {
+            mystery_model_transform = this.mystery_Fish_Matrix.times( Mat4.translation([(0.05) * Math.cos(this.mystery_angle), (0.05) * Math.sin(this.mystery_angle), 0]));
+            this.mystery_Fish_Matrix = mystery_model_transform;
+            mystery_model_transform = mystery_model_transform.times( Mat4.rotation( this.mystery_angle, Vec.of(0, 0, 1)))
+            mystery_model_transform = mystery_model_transform.times( Mat4.scale([2, .5, 2]));
+            this.shapes.plane.draw( graphics_state, mystery_model_transform, this.materials.mystery_Fish);
         }     
 
         // ***************************** END MYSTERY FISH *****************************  
