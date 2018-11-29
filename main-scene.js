@@ -13,11 +13,13 @@ class Fishing_Game extends Scene_Component
         const shapes = { box:       new Cube(),
                          plane:     new Square(),
                          sphere6:   new Subdivision_Sphere(6),
+                         torus:     new Torus( 20, 20 ),
                        }
         this.submit_shapes( context, shapes );
 
         this.materials =
           { phong:          context.get_instance( Phong_Shader ).material( Color.of( 0,0,1,1 ) ),
+            red:            context.get_instance( Phong_Shader ).material( Color.of( 1 ,0, 0 ,1 ), { ambient: 1 } ),
             king_Fish:      context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/King_Of_The_Pond.png", false ) } ),
             mystery_Fish:   context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Mystery_Fish.png", false ) } ),
             plain_Fish:     context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Plain_Ol_Fish.png", false ) } ),
@@ -27,6 +29,8 @@ class Fishing_Game extends Scene_Component
           }
 
         this.lights = [ new Light( Vec.of( -5,5,5,1 ), Color.of( 0,1,1,1 ), 100000 ) ];
+
+        this.crosshair_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .01]));
 
         this.king_Fish_Matrix = Mat4.identity().times( Mat4.translation([0, 0, -0.15]));  
         this.king_angle = 0
@@ -83,12 +87,30 @@ class Fishing_Game extends Scene_Component
 
     make_control_panel()
       { 
-        this.key_triggered_button( "Resume/Pause Game", [ "c" ], this.pause_resume );
+        this.key_triggered_button( "Move Left", [ "j" ], this.move_left );
+        this.key_triggered_button( "Move Right", [ "l" ], this.move_right );
+        this.key_triggered_button( "Move Up", [ "i" ], this.move_up );
+        this.key_triggered_button( "Move Down", [ "k" ], this.move_down );
       }
     
-    pause_resume()
+    move_left()
      {
-        this.pause = !this.pause;   
+        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([-0.1, 0, 0]));   
+     }
+
+    move_right()
+     {
+        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0.1, 0, 0]));   
+     }
+
+    move_up()
+     {
+        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, 0.1, 0]));   
+     }
+
+    move_down()
+     {
+        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, -0.1, 0]));   
      }
 
     // ***************************** BEGIN ANGLE HELPER FUNCTIONS ***************************** 
@@ -144,6 +166,10 @@ class Fishing_Game extends Scene_Component
 
         // Draw flattened blue sphere for temporary pond:
         this.shapes.sphere6.draw( graphics_state, this.pond_Matrix, this.materials.phong);
+
+        // Draw Crosshairs
+        this.shapes.sphere6.draw( graphics_state, this.crosshair_Matrix.times(Mat4.scale([.25, .25, 1])) , this.materials.red);
+        this.shapes.torus.draw( graphics_state, this.crosshair_Matrix.times(Mat4.scale([.25, .25, 1])) , this.materials.red);
 
         // ***************************** BEGIN KING OF THE POND *****************************
         
