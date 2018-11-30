@@ -5,7 +5,7 @@ class Fishing_Game extends Scene_Component
         if( !context.globals.has_controls   ) 
           context.register_scene_component( new Movement_Controls( context, control_box.parentElement.insertCell() ) ); 
 
-        context.globals.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20,20 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
+        context.globals.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20, 20 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
 
         const r = context.width/context.height;
         context.globals.graphics_state.projection_transform = Mat4.perspective( Math.PI/4, r, .1, 1000 );
@@ -21,9 +21,10 @@ class Fishing_Game extends Scene_Component
         const shapes = { box:       new Cube(),
                          plane:     new Square(),
                          sphere6:   new Subdivision_Sphere(6),
-                         torus:     new Torus( 20, 20 ),
+                         circletry: new ( Subdivision_Sphere.prototype.make_flat_shaded_version()) (6), 
+                         torus:     new ( Torus.prototype.make_flat_shaded_version() )( 20, 20 ) ,
                          cylinder:  new Capped_Cylinder(20, 20),
-                         circle: new Regular_2D_Polygon(),
+                         circle: new Circle(),
                        }
         this.submit_shapes( context, shapes );
 
@@ -124,7 +125,7 @@ class Fishing_Game extends Scene_Component
 
         this.pond_Matrix = Mat4.identity();
         this.pond_Matrix = this.pond_Matrix.times( Mat4.translation([0, 0, 1]))
-                                           .times( Mat4.scale([10, 10, .01]));
+                                           .times( Mat4.scale([7, 7, .01]));
 
         this.bottom_Matrix = Mat4.identity();
         this.bottom_Matrix = this.bottom_Matrix.times( Mat4.translation([0, 0, -1]))
@@ -345,7 +346,7 @@ class Fishing_Game extends Scene_Component
             //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
 
             // Draw flattened blue sphere for temporary pond:
-            this.shapes.sphere6.draw( graphics_state, this.pond_Matrix, this.materials.phong);
+            this.shapes.torus.draw( graphics_state, this.pond_Matrix, this.materials.phong);
       }
 
 
