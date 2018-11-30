@@ -27,7 +27,7 @@ class Fishing_Game extends Scene_Component
         this.submit_shapes( context, shapes );
 
         this.materials =
-          { phong:          context.get_instance( Phong_Shader ).material( Color.of( 0,0,1, .6 ), { ambient: 1} ),
+          { phong:          context.get_instance( Phong_Shader ).material( Color.of( 0, 0, 1, .3 ), { ambient: 1} ),
             red:            context.get_instance( Phong_Shader ).material( Color.of( 1 ,0, 0 ,1 ), { ambient: 1 } ),
             green:          context.get_instance( Phong_Shader ).material( Color.of( 0 ,1, 0 ,1 ), { ambient: 1 } ),
             king_Fish:      context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/King_Of_The_Pond.png", false ) } ),
@@ -305,10 +305,10 @@ class Fishing_Game extends Scene_Component
         const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;
         this.time = t;
 
-        // Draw flattened blue sphere for temporary pond:
-        this.shapes.sphere6.draw( graphics_state, this.pond_Matrix, this.materials.phong);
+        //draw the bottom of the pond
 
-        this.gl.depthMask(true);
+        this.shapes.sphere6.draw( graphics_state, this.bottom_Matrix, this.materials.phong.override( { color: Color.of( .5, .5, .5, 1) } ));
+
 
         // Draw Crosshairs
         if(!this.catching)
@@ -851,11 +851,8 @@ class Fishing_Game extends Scene_Component
         //this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
         //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
 
-        //draw the bottom of the pond
-
-        this.shapes.sphere6.draw( graphics_state, this.bottom_Matrix, this.materials.phong.override( { color: Color.of( .5, .5, .5, 1) } ));
-
-        this.gl.depthMask(false);
+           // Draw flattened blue sphere for temporary pond:
+        this.shapes.sphere6.draw( graphics_state, this.pond_Matrix, this.materials.phong);
       }
   }
 
