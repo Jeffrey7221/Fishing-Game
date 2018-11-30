@@ -5,10 +5,18 @@ class Fishing_Game extends Scene_Component
         if( !context.globals.has_controls   ) 
           context.register_scene_component( new Movement_Controls( context, control_box.parentElement.insertCell() ) ); 
 
-        context.globals.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0,0,20 ), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
+        context.globals.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20,20 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
 
         const r = context.width/context.height;
         context.globals.graphics_state.projection_transform = Mat4.perspective( Math.PI/4, r, .1, 1000 );
+
+        let gl = [];
+        let element = document.getElementById("main-canvas");
+        const canvas =  element.children[0];
+        for ( let name of [ "webgl", "experimental-webgl", "webkit-3d", "moz-webgl" ] )   // Get the GPU ready, creating a new WebGL context
+            if (  gl = this.gl = canvas.getContext( name ) ) break;                    // for this canvas.
+        if   ( !gl ) throw "Canvas failed to make a WebGL context.";
+
 
         const shapes = { box:       new Cube(),
                          plane:     new Square(),
@@ -19,7 +27,7 @@ class Fishing_Game extends Scene_Component
         this.submit_shapes( context, shapes );
 
         this.materials =
-          { phong:          context.get_instance( Phong_Shader ).material( Color.of( 0,0,1,1 ) ),
+          { phong:          context.get_instance( Phong_Shader ).material( Color.of( 0,0,1, .6 ), { ambient: 1} ),
             red:            context.get_instance( Phong_Shader ).material( Color.of( 1 ,0, 0 ,1 ), { ambient: 1 } ),
             green:          context.get_instance( Phong_Shader ).material( Color.of( 0 ,1, 0 ,1 ), { ambient: 1 } ),
             king_Fish:      context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/King_Of_The_Pond.png", false ) } ),
@@ -30,7 +38,7 @@ class Fishing_Game extends Scene_Component
             nibbler:        context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Nibbler.png", false ) } ),
           }
 
-        this.lights = [ new Light( Vec.of( -5,5,5,1 ), Color.of( 0,1,1,1 ), 100000 ) ];
+        this.lights = [ new Light( Vec.of( 0,5,5,1 ), Color.of( 0,1,1,1 ), 50 ) ];
 
         this.crosshair_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .01]));
 
@@ -98,7 +106,11 @@ class Fishing_Game extends Scene_Component
                                                  .times( Mat4.scale([.5, .5, .5]));         
 
         this.pond_Matrix = Mat4.identity();
-        this.pond_Matrix = this.pond_Matrix.times( Mat4.translation([0, 0, -1]))
+        this.pond_Matrix = this.pond_Matrix.times( Mat4.translation([0, 0, 1]))
+                                           .times( Mat4.scale([10, 10, .01]));
+
+        this.bottom_Matrix = Mat4.identity();
+        this.bottom_Matrix = this.bottom_Matrix.times( Mat4.translation([0, 0, -1]))
                                            .times( Mat4.scale([10, 10, .01]));
 
         this.catching = false;
@@ -119,22 +131,22 @@ class Fishing_Game extends Scene_Component
     
     move_left()
      {
-        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([-0.1, 0, 0]));   
+        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([-0.2, 0, 0]));   
      }
 
     move_right()
      {
-        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0.1, 0, 0]));   
+        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0.2, 0, 0]));   
      }
 
     move_up()
      {
-        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, 0.1, 0]));   
+        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, 0.2, 0]));   
      }
 
     move_down()
      {
-        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, -0.1, 0]));   
+        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, -0.2, 0]));   
      }
 
     catch_fish()
@@ -220,12 +232,15 @@ class Fishing_Game extends Scene_Component
      
     display( graphics_state )
       { 
+        
         graphics_state.lights = this.lights;        
         const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;
         this.time = t;
 
         // Draw flattened blue sphere for temporary pond:
         this.shapes.sphere6.draw( graphics_state, this.pond_Matrix, this.materials.phong);
+
+        this.gl.depthMask(true);
 
         // Draw Crosshairs
         if(!this.catching)
@@ -634,6 +649,12 @@ class Fishing_Game extends Scene_Component
 
         //this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
         //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
+
+        //draw the bottom of the pond
+
+        this.shapes.sphere6.draw( graphics_state, this.bottom_Matrix, this.materials.phong.override( { color: Color.of( .5, .5, .5, 1) } ));
+
+        this.gl.depthMask(false);
       }
   }
 
@@ -690,3 +711,4 @@ class Texture_Rotate extends Phong_Shader
         }`;
     }
 }
+
