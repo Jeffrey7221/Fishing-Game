@@ -45,6 +45,7 @@ class Fishing_Game extends Scene_Component
         this.mystery_angle = 0;
         this.mystery_model_spawn = Mat4.identity().times( Mat4.scale([.2, .05, .2]));
         this.mystery_spawn_time = Math.random() * 12 + 10;
+        this.mystery_dist = 0.01;
         this.mystery_caught = false;
         this.mystery_direction = -1;
 
@@ -309,16 +310,16 @@ class Fishing_Game extends Scene_Component
         if(!this.mystery_caught)
         {
             // If statement to turn fish if it will translate out of pond
-            if((Math.abs(this.mystery_Fish_Matrix[0][3] + Math.cos(this.mystery_angle)) > 5.5 || Math.abs(this.mystery_Fish_Matrix[1][3] + Math.sin(this.mystery_angle)) > 5.5) && Math.round( (t % 0.5) * 10) / 10 == 0)
+            if((Math.abs(this.mystery_Fish_Matrix[0][3] + Math.cos(this.mystery_angle)) > 5 || Math.abs(this.mystery_Fish_Matrix[1][3] + Math.sin(this.mystery_angle)) > 5) && Math.round( (t % 0.5) * 10) / 10 == 0)
             {
                 this.random_mystery_angle();
                 this.mystery_direction *= -1;
             }
 
-            if(Math.round( (t % 1.5) * 10) / 10 == .7)
-            {
-                this.mystery_angle = (Math.atan2( (this.mystery_Fish_Matrix[1][3]) , (this.mystery_Fish_Matrix[0][3]) )) + (this.mystery_direction * (0.01));
-            }
+            //if(Math.round( (t % 1.5) * 10) / 10 == .7)
+            //{
+            //    this.mystery_angle = (Math.atan2( (this.mystery_Fish_Matrix[1][3]) , (this.mystery_Fish_Matrix[0][3]) )) + (this.mystery_direction * (0.01));
+            //}
 
             // Code block to draw Mystery fish      
             if(t > this.mystery_spawn_time && t < this.mystery_spawn_time + 0.2)
@@ -335,7 +336,18 @@ class Fishing_Game extends Scene_Component
 
             if(t > this.mystery_spawn_time + 0.2)
             {
-                mystery_model_transform = this.mystery_Fish_Matrix.times( Mat4.translation([(0.1) * Math.cos(this.mystery_angle), (0.1) * Math.sin(this.mystery_angle), 0]));
+                mystery_model_transform = this.mystery_Fish_Matrix.times( Mat4.translation([(6 / (t - this.mystery_dist)) * (0.05) * Math.cos(this.mystery_angle), (6 / (t - this.mystery_dist)) * (0.05) * Math.sin(this.mystery_angle), 0]));
+
+                if( 6 / (t - this.mystery_dist) < 0.83)
+                {
+                    this.mystery_dist += 1;
+                }
+
+                if( t - this.mystery_dist > 2 )
+                {
+                    this.mystery_dist += 1;
+                }
+
                 this.mystery_Fish_Matrix = mystery_model_transform;
                 mystery_model_transform = mystery_model_transform.times( Mat4.rotation( this.mystery_angle, Vec.of(0, 0, 1)))
                 mystery_model_transform = mystery_model_transform.times( Mat4.scale([2, .5, 2]));
