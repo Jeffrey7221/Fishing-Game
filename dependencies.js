@@ -43,6 +43,19 @@ class Square2 extends Shape              // A square, demonstrating two triangle
     }
 }
 
+window.Circle = window.classes.Circle =
+class Circle extends Shape              // A square, demonstrating two triangles that share vertices.  On any planar surface, the interior 
+                                        // edges don't make any important seams.  In these cases there's no reason not to re-use data of
+{                                       // the common vertices between triangles.  This makes all the vertex arrays (position, normals, 
+  constructor()                         // etc) smaller and more cache friendly.
+    { super( "positions", "normals", "texture_coords" );                                   // Name the values we'll define per each vertex.
+      this.positions     .push( ...Vec.cast( [-1,-1,0], [1,-1,0], [-1,1,0], [1,1,0] ) );   // Specify the 4 square corner locations.
+      this.normals       .push( ...Vec.cast( [0,0,1],   [0,0,1],  [0,0,1],  [0,0,1] ) );   // Match those up with normal vectors.
+      this.texture_coords.push( ...Vec.cast( [0,0],     [2,0],    [0,2],    [2,2]   ) );   // Draw a square in texture coordinates too.
+      this.indices       .push( 0, 1, 2,     1, 3, 2 );                   // Two triangles this time, indexing into four distinct vertices.
+    }
+}
+
 
 window.Tetrahedron = window.classes.Tetrahedron =
 class Tetrahedron extends Shape                       // The Tetrahedron shape demonstrates flat vs smooth shading (a boolean argument 
@@ -306,7 +319,7 @@ class Torus extends Shape                                         // Build a don
   { constructor( rows, columns )  
       { super( "positions", "normals", "texture_coords" );
         const circle_points = Array( rows ).fill( Vec.of( .75,0,0 ) )
-                                           .map( (p,i,a) => Mat4.translation([ -2,0,0 ])
+                                           .map( (p,i,a) => Mat4.translation([ .70,0,0 ])
                                                     .times( Mat4.rotation( i/(a.length-1) * 2*Math.PI, Vec.of( 0,-1,0 ) ) )
                                                     .times( p.to4(1) ).to3() );
 
@@ -579,7 +592,7 @@ class Phong_Shader extends Shader          // THE DEFAULT SHADER: This uses the 
           }                                 // If we get this far, calculate Smooth "Phong" Shading as opposed to Gouraud Shading.
                                             // Phong shading is not to be confused with the Phong Reflection Model.
           vec4 tex_color = texture2D( texture, f_tex_coord );                         // Sample the texture image in the correct place.
-          
+
           if( USE_TEXTURE && tex_color.w < .01 ) discard;
                                                                                       // Compute an initial (ambient) color:
           if( USE_TEXTURE ) gl_FragColor = vec4( ( tex_color.xyz + shapeColor.xyz ) * ambient, shapeColor.w * tex_color.w ); 
