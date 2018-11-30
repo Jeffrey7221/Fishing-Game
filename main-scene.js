@@ -5,7 +5,7 @@ class Fishing_Game extends Scene_Component
         if( !context.globals.has_controls   ) 
           context.register_scene_component( new Movement_Controls( context, control_box.parentElement.insertCell() ) ); 
 
-        context.globals.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20, 20 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
+        context.globals.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -15, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
 
         const r = context.width/context.height;
         context.globals.graphics_state.projection_transform = Mat4.perspective( Math.PI/4, r, .1, 1000 );
@@ -24,7 +24,7 @@ class Fishing_Game extends Scene_Component
                          circletry: new ( Subdivision_Sphere.prototype.make_flat_shaded_version()) (6), 
                          torus:     new ( Torus.prototype.make_flat_shaded_version() )( 20, 20 ) ,
                          cylinder:  new Capped_Cylinder(20, 20),
-                         circle: new Circle(),
+                         circle:    new Circle(),
                        }
         this.submit_shapes( context, shapes );
 
@@ -32,6 +32,7 @@ class Fishing_Game extends Scene_Component
           { phong:          context.get_instance( Phong_Shader ).material( Color.of( 0, 0, 1, .3 ), { ambient: 1} ),
             red:            context.get_instance( Phong_Shader ).material( Color.of( 1 ,0, 0 ,1 ), { ambient: 1 } ),
             green:          context.get_instance( Phong_Shader ).material( Color.of( 0 ,1, 0 ,1 ), { ambient: 1 } ),
+            white:          context.get_instance( Phong_Shader ).material( Color.of( 1 ,1, 1 ,1 ), { ambient: 1 } ),  
             king_Fish:      context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/King_Of_The_Pond.png", false ) } ),
             mystery_Fish:   context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Mystery_Fish.png", false ) } ),
             plain_Fish:     context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Plain_Ol_Fish.png", false ) } ),
@@ -42,7 +43,12 @@ class Fishing_Game extends Scene_Component
 
         this.lights = [ new Light( Vec.of( 0,5,5,1 ), Color.of( 0,1,1,1 ), 50 ) ];
 
-        this.crosshair_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .01]));
+        this.crosshair_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
+        this.sphere1_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
+        this.sphere2_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
+        this.torus1_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
+        this.torus2_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
+        this.cylinder_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
 
         this.king_Fish_Matrix = Mat4.identity().times( Mat4.translation([0, 0, -0.15]));  
         this.king_angle = 0
@@ -144,27 +150,42 @@ class Fishing_Game extends Scene_Component
         this.key_triggered_button( "Move Right", [ "l" ], this.move_right );
         this.key_triggered_button( "Move Up", [ "i" ], this.move_up );
         this.key_triggered_button( "Move Down", [ "k" ], this.move_down );
-        this.key_triggered_button( "Catch Fish", [ ";" ], this.catch_fish );
+        if(!this.catching)
+        {
+            this.key_triggered_button( "Catch Fish", [ ";" ], this.catch_fish );              
+        }
       }
     
     move_left()
      {
-        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([-0.2, 0, 0]));   
+        if((this.crosshair_Matrix[0][3] - 0.2) * (this.crosshair_Matrix[0][3] - 0.2) + (this.crosshair_Matrix[1][3]) * (this.crosshair_Matrix[1][3]) < 72.25)
+        {
+            this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([-0.2, 0, 0]));       
+        } 
      }
 
     move_right()
      {
-        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0.2, 0, 0]));   
+        if((this.crosshair_Matrix[0][3] + 0.2) * (this.crosshair_Matrix[0][3] + 0.2) + (this.crosshair_Matrix[1][3]) * (this.crosshair_Matrix[1][3]) < 72.25)
+        {
+            this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0.2, 0, 0]));
+        }           
      }
 
     move_up()
      {
-        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, 0.2, 0]));   
+        if((this.crosshair_Matrix[0][3]) * (this.crosshair_Matrix[0][3]) + (this.crosshair_Matrix[1][3] + 0.2) * (this.crosshair_Matrix[1][3] + 0.2) < 72.25)
+        {
+            this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, 0.2, 0]));
+        }          
      }
 
     move_down()
      {
-        this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, -0.2, 0]));   
+        if((this.crosshair_Matrix[0][3]) * (this.crosshair_Matrix[0][3]) + (this.crosshair_Matrix[1][3] - 0.2) * (this.crosshair_Matrix[1][3] - 0.2) < 72.25)
+        {
+            this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, -0.2, 0]));
+        }           
      }
 
     catch_fish()
@@ -309,7 +330,7 @@ class Fishing_Game extends Scene_Component
         const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;
         this.time = t;
 
-        //draw the bottom of the pond
+        // Draw the bottom of the pond
 
         this.shapes.sphere6.draw( graphics_state, this.bottom_Matrix, this.materials.phong.override( { color: Color.of( .5, .5, .5, 1) } ));
 
@@ -317,43 +338,98 @@ class Fishing_Game extends Scene_Component
         // Draw Crosshairs
         if(!this.catching)
         {
-            this.shapes.sphere6.draw( graphics_state, this.crosshair_Matrix.times(Mat4.scale([.05, .05, 1])) , this.materials.red);
-            this.shapes.torus.draw( graphics_state, this.crosshair_Matrix.times(Mat4.scale([.07, .07, 1])) , this.materials.red);
-            this.shapes.cylinder.draw( graphics_state, this.crosshair_Matrix.times(Mat4.scale([.05, .05, 100])).times(Mat4.translation([0, 0, 1 + 0.15 * Math.sin((3 * t) % (2 * Math.PI))])) , this.materials.red);
+            this.sphere1_Matrix = this.crosshair_Matrix.times(Mat4.scale([.05, .05, 1]));
+            this.sphere2_Matrix = this.crosshair_Matrix.times(Mat4.scale([.05, .05, 1])).times(Mat4.translation([0, 0, 10 + 0.50 * Math.sin((6 * t) % (2 * Math.PI))]));            
+            this.torus1_Matrix = this.crosshair_Matrix.times(Mat4.scale([.07, .07, 1])).times(Mat4.translation([0, 0, 10 + 0.50 * Math.sin((6 * t) % (2 * Math.PI))]));      
+            this.torus2_Matrix = this.crosshair_Matrix.times(Mat4.scale([.08, .08, .1])).times(Mat4.translation([0, 0, 100 + 5 * Math.sin((6 * t) % (2 * Math.PI))]));          
+            this.cylinder_Matrix = this.crosshair_Matrix.times(Mat4.scale([.01, .01, 200])).times(Mat4.translation([0, 0, 0.5]));                                       
         }
 
         else
         {
-            this.shapes.sphere6.draw( graphics_state, this.crosshair_Matrix.times(Mat4.scale([.05, .05, 1])) , this.materials.green);
-            this.shapes.torus.draw( graphics_state, this.crosshair_Matrix.times(Mat4.scale([.07, .07, 1])) , this.materials.green);
-            this.shapes.cylinder.draw( graphics_state, this.crosshair_Matrix.times(Mat4.scale([.05, .05, 100])).times(Mat4.translation([0, 0, .6])) , this.materials.green);
-            
-            if(this.catching_timer > 8)
+            if(this.sphere1_Matrix[2][3] < 1.5 && this.catching_timer >= 0)
             {
-                this.catching = false;
-                this.catching_timer = 0;
+                  this.sphere1_Matrix[2][3] += 0.3;
             }
-            else
+            else if(this.sphere1_Matrix[2][3] > 0 && this.catching_timer == -1)
+            {
+                  this.sphere1_Matrix[2][3] -= 0.1;
+            }
+
+            if(this.sphere2_Matrix[2][3] < 2.5 && this.catching_timer >= 0)
+            {
+                  this.sphere2_Matrix[2][3] += 0.3;
+            }
+            else if(this.sphere2_Matrix[2][3] > 1 && this.catching_timer == -1)
+            {
+                  this.sphere2_Matrix[2][3] -= 0.1;
+            }
+
+            if(this.torus1_Matrix[2][3] < 2.5 && this.catching_timer >= 0)
+            {
+                  this.torus1_Matrix[2][3] += 0.3;
+            }
+            else if(this.torus1_Matrix[2][3] > 1 && this.catching_timer == -1)
+            {
+                  this.torus1_Matrix[2][3] -= 0.1;
+            }
+
+            if(this.torus2_Matrix[2][3] < 2.5 && this.catching_timer >= 0)
+            {
+                  this.torus2_Matrix[2][3] += 0.3;
+            }
+            else if(this.torus2_Matrix[2][3] > 1 && this.catching_timer == -1)
+            {
+                  this.torus2_Matrix[2][3] -= 0.1;
+            }
+
+            if(this.cylinder_Matrix[2][3] < 11.5 && this.catching_timer >= 0)
+            {
+                  this.cylinder_Matrix[2][3] += 0.3;
+            }
+            else if(this.cylinder_Matrix[2][3] > 10 && this.catching_timer == -1)
+            {
+                  this.cylinder_Matrix[2][3] -= 0.1;
+            }
+            
+            if(this.catching_timer > 50)
+            {
+                this.catching_timer = -1;
+            }
+            else if(this.catching_timer >= 0)
             {
                 this.catching_timer++;
             }
+            if(this.sphere1_Matrix[2][3] <= 0 && this.catching_timer == -1)
+            {
+                this.catching_timer = 0;
+                this.catching = false;
+            }
         }
-            // Helper function to draw the fish
-            this.draw_the_fish(graphics_state, t)
 
+        this.shapes.sphere6.draw( graphics_state, this.sphere1_Matrix, this.materials.red);
+        this.shapes.sphere6.draw( graphics_state, this.sphere2_Matrix, this.materials.red);
+        this.shapes.torus.draw( graphics_state, this.torus1_Matrix, this.materials.white);
+        this.shapes.torus.draw( graphics_state, this.torus2_Matrix, this.materials.red);
+        this.shapes.cylinder.draw( graphics_state, this.cylinder_Matrix, this.materials.white.override( { color: Color.of( .7, .7, .7, .5) } ));
 
-            //this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
-            //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
+        // Helper function to draw the fish
+        this.draw_the_fish(graphics_state, t)
 
-            // Draw flattened blue sphere for temporary pond:
-            this.shapes.torus.draw( graphics_state, this.pond_Matrix, this.materials.phong);
+        //this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
+        //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
+
+        // Draw flattened blue sphere for temporary pond:
+        this.shapes.torus.draw( graphics_state, this.pond_Matrix, this.materials.phong);
       }
 
 
-                        // *************************************************************************
-                        // ***************************** DRAW THE FISH *****************************
-                        // *************************************************************************
-      draw_the_fish(graphics_state, t) {
+         // *************************************************************************
+         // ***************************** DRAW THE FISH *****************************
+         // *************************************************************************
+
+    draw_the_fish(graphics_state, t) 
+      {
 
         // ***************************** BEGIN KING OF THE POND *****************************
         
