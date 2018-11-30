@@ -23,6 +23,7 @@ class Fishing_Game extends Scene_Component
                          sphere6:   new Subdivision_Sphere(6),
                          torus:     new Torus( 20, 20 ),
                          cylinder:  new Capped_Cylinder(20, 20),
+                         circle: new Regular_2D_Polygon(),
                        }
         this.submit_shapes( context, shapes );
 
@@ -297,6 +298,8 @@ class Fishing_Game extends Scene_Component
       }
                      
     // ***************************** END ANGLE HELPER FUNCTIONS ***************************** 
+
+    // ***************************** START OF DISPLAY ***************************** 
      
     display( graphics_state )
       { 
@@ -334,6 +337,22 @@ class Fishing_Game extends Scene_Component
                 this.catching_timer++;
             }
         }
+            // Helper function to draw the fish
+            this.draw_the_fish(graphics_state, t)
+
+
+            //this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
+            //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
+
+            // Draw flattened blue sphere for temporary pond:
+            this.shapes.sphere6.draw( graphics_state, this.pond_Matrix, this.materials.phong);
+      }
+
+
+                        // *************************************************************************
+                        // ***************************** DRAW THE FISH *****************************
+                        // *************************************************************************
+      draw_the_fish(graphics_state, t) {
 
         // ***************************** BEGIN KING OF THE POND *****************************
         
@@ -846,13 +865,6 @@ class Fishing_Game extends Scene_Component
         }
 
         // ***************************** END NIBBLER FISH *****************************  
-  
-
-        //this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
-        //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
-
-           // Draw flattened blue sphere for temporary pond:
-        this.shapes.sphere6.draw( graphics_state, this.pond_Matrix, this.materials.phong);
       }
   }
 
@@ -909,4 +921,5 @@ class Texture_Rotate extends Phong_Shader
         }`;
     }
 }
+
 
