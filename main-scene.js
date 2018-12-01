@@ -18,6 +18,16 @@ class Fishing_Game extends Scene_Component
         if   ( !gl ) throw "Canvas failed to make a WebGL context.";
 
 
+        //Shadow mapping
+        this.webgl_manager = context;      // Save off the Webgl_Manager object that created the scene.
+        this.scratchpad = document.createElement('canvas');
+        this.scratchpad_context = this.scratchpad.getContext('2d');     // A hidden canvas for re-sizing the real canvas to be square.
+        this.scratchpad.width   = 1024;
+        this.scratchpad.height  = 1024;
+        this.texture = new Texture ( context.gl, "", false, false );        // Initial image source: Blank gif file
+        this.texture.image.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
+
         const shapes = { box:       new Cube(),
                          plane:     new Square(),
                          sphere6:   new Subdivision_Sphere(6),
@@ -33,6 +43,7 @@ class Fishing_Game extends Scene_Component
         this.materials =     
           { terrain:          context.get_instance( Phong_Shader ).material( Color.of( 0, 0, 1, .3 ), { ambient: 1} ),
             ground:          context.get_instance( Fake_Bump_Map ).material( Color.of( 109/255, 78/255, 0/255, 1 ), { ambient: .40, texture: context.get_instance( "assets/ground_texture.jpeg", false ) } ),
+            shadow: context.get_instance(Shadow_Shader).material( Color.of( 0, 0, 0, 1 ), { ambient: 1, texture: this.texture } ),
             red:            context.get_instance( Phong_Shader ).material( Color.of( 1 ,0, 0 ,1 ), { ambient: 1 } ),
             green:          context.get_instance( Phong_Shader ).material( Color.of( 0 ,1, 0 ,1 ), { ambient: 1 } ),
             white:          context.get_instance( Phong_Shader ).material( Color.of( 1 ,1, 1 ,1 ), { ambient: 1 } ),  
@@ -145,7 +156,8 @@ class Fishing_Game extends Scene_Component
 
         this.bottom_Matrix = Mat4.identity();
         this.bottom_Matrix = this.bottom_Matrix.times( Mat4.translation([0, 0, -1]))
-                                           .times( Mat4.scale([15, 15, .01]));
+                                           .times( Mat4.scale([15, 15, .01]))
+                                           .times( Mat4.rotation(Math.PI, [1,0,0]) );
 
         this.tree_Matrix = Mat4.identity();
         this.tree_Matrix = this.tree_Matrix.times( Mat4.rotation( 1.6, Vec.of( 1, 0, 0)))
@@ -158,6 +170,7 @@ class Fishing_Game extends Scene_Component
 
         this.pause = true;
         this.time = 0;            
+
       }
 
     make_control_panel()
@@ -170,6 +183,10 @@ class Fishing_Game extends Scene_Component
         {
             this.key_triggered_button( "Catch Fish", [ ";" ], this.catch_fish );              
         }
+
+        this.result_img = this.control_panel.appendChild( Object.assign( document.createElement( "img" ), 
+                { style:"width:200px; height:" + 200 * this.aspect_ratio + "px" } ) );
+                
       }
     
     move_left()
@@ -341,14 +358,30 @@ class Fishing_Game extends Scene_Component
      
     display( graphics_state )
       { 
-        
         graphics_state.lights = this.lights;        
         const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;
         this.time = t;
 
-        // Draw the bottom of the pond
 
-        this.shapes.sphere6.draw( graphics_state, this.bottom_Matrix, this.materials.terrain.override( { color: Color.of( .5, .5, .5, 1) } ));
+        // ***************************** Shadow Map *********************************
+        // Helper function to draw the fish - Scene 1
+        graphics_state.camera_transform =  Mat4.look_at( Vec.of( 0,5,40,1 ), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
+        this.draw_the_fish(graphics_state, t)
+        //transforming camera to light source
+
+        this.scratchpad_context.drawImage( this.webgl_manager.canvas, 0, 0, 1024, 1024 );
+//         this.texture.image.src = this.scratchpad.toDataURL("image/png");        // Clear the canvas and start over, beginning scene 2:
+        this.texture.image.src = this.result_img.src = this.scratchpad.toDataURL("image/png");
+        this.webgl_manager.gl.clear( this.webgl_manager.gl.COLOR_BUFFER_BIT | this.webgl_manager.gl.DEPTH_BUFFER_BIT);
+        //  ******************************* End Shadow Map ****************************
+
+        //transforming camera back
+        graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -15, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
+        this.draw_the_fish(graphics_state, t)
+
+
+        // Draw the bottom of the pond
+        this.shapes.sphere6.draw( graphics_state, this.bottom_Matrix, this.materials.shadow);
 
 
         // Draw Crosshairs
@@ -423,26 +456,26 @@ class Fishing_Game extends Scene_Component
             }
         }
 
+        //FISHING ROD
         this.shapes.sphere6.draw( graphics_state, this.sphere1_Matrix, this.materials.red);
         this.shapes.sphere6.draw( graphics_state, this.sphere2_Matrix, this.materials.red);
         this.shapes.torus.draw( graphics_state, this.torus1_Matrix, this.materials.white);
         this.shapes.torus.draw( graphics_state, this.torus2_Matrix, this.materials.red);
         this.shapes.cylinder.draw( graphics_state, this.cylinder_Matrix, this.materials.white.override( { color: Color.of( .7, .7, .7, .5) } ));
 
-        // Helper function to draw the fish
-        this.draw_the_fish(graphics_state, t)
+
 
         //this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
         //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
 
-            // Draw flattened blue sphere for temporary pond:
-            this.shapes.pond.draw( graphics_state, this.pond_Matrix, this.materials.terrain);
+        // Draw flattened blue sphere for temporary pond:
+        this.shapes.pond.draw( graphics_state, this.pond_Matrix, this.materials.terrain);
 
-            this.shapes.torus.draw( graphics_state, this.ground_Matrix, this.materials.ground);
+        this.shapes.torus.draw( graphics_state, this.ground_Matrix, this.materials.ground);
 
 //             this.shapes.tree.draw( graphics_state, this.tree_Matrix, this.materials.tree);
-            this.shapes.tree_stem.draw( graphics_state, this.tree_Matrix, this.materials.tree.override( { color: Color.of( 60/255, 40/255, 5/255 )}));
-            this.shapes.tree_leaves.draw( graphics_state, this.tree_Matrix, this.materials.tree);
+        this.shapes.tree_stem.draw( graphics_state, this.tree_Matrix, this.materials.tree.override( { color: Color.of( 60/255, 40/255, 5/255 )}));
+        this.shapes.tree_leaves.draw( graphics_state, this.tree_Matrix, this.materials.tree);
       }
 
 
@@ -963,7 +996,8 @@ class Fishing_Game extends Scene_Component
             }     
         }
 
-        // ***************************** END NIBBLER FISH *****************************  
+        // ***************************** END NIBBLER FISH *****************************
+          
       }
   }
 
