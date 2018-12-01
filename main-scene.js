@@ -22,8 +22,8 @@ class Fishing_Game extends Scene_Component
         this.webgl_manager = context;      // Save off the Webgl_Manager object that created the scene.
         this.scratchpad = document.createElement('canvas');
         this.scratchpad_context = this.scratchpad.getContext('2d');     // A hidden canvas for re-sizing the real canvas to be square.
-        this.scratchpad.width   = 1024;
-        this.scratchpad.height  = 1024;
+        this.scratchpad.width   = 256;
+        this.scratchpad.height  = 256;
         this.texture = new Texture ( context.gl, "", false, false );        // Initial image source: Blank gif file
         this.texture.image.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
@@ -369,7 +369,7 @@ class Fishing_Game extends Scene_Component
         this.draw_the_fish(graphics_state, t)
         //transforming camera to light source
 
-        this.scratchpad_context.drawImage( this.webgl_manager.canvas, 0, 0, 1024, 1024 );
+        this.scratchpad_context.drawImage( this.webgl_manager.canvas, 0, 0, 256, 256 );
 //         this.texture.image.src = this.scratchpad.toDataURL("image/png");        // Clear the canvas and start over, beginning scene 2:
         this.texture.image.src = this.result_img.src = this.scratchpad.toDataURL("image/png");
         this.webgl_manager.gl.clear( this.webgl_manager.gl.COLOR_BUFFER_BIT | this.webgl_manager.gl.DEPTH_BUFFER_BIT);
