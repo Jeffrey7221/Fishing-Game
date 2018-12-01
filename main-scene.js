@@ -5,7 +5,7 @@ class Fishing_Game extends Scene_Component
         if( !context.globals.has_controls   ) 
           context.register_scene_component( new Movement_Controls( context, control_box.parentElement.insertCell() ) ); 
 
-        context.globals.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20, 20 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
+        context.globals.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -22, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
 
         const r = context.width/context.height;
         context.globals.graphics_state.projection_transform = Mat4.perspective( Math.PI/4, r, .1, 1000 );
@@ -21,15 +21,17 @@ class Fishing_Game extends Scene_Component
         const shapes = { box:       new Cube(),
                          plane:     new Square(),
                          sphere6:   new Subdivision_Sphere(6),
-                         circletry: new ( Subdivision_Sphere.prototype.make_flat_shaded_version()) (6), 
+                         pond:      new ( Circle.prototype.make_flat_shaded_version() ) ( 20, 20), 
                          torus:     new ( Torus.prototype.make_flat_shaded_version() )( 20, 20 ) ,
                          cylinder:  new Capped_Cylinder(20, 20),
-                         circle: new Circle(),
+                         tree_stem: new Shape_From_File( "assets/MapleTreeStem.obj" ),
+                         tree_leaves: new Shape_From_File( "assets/MapleTreeLeaves.obj" ),
                        }
         this.submit_shapes( context, shapes );
 
-        this.materials =
-          { phong:          context.get_instance( Phong_Shader ).material( Color.of( 0, 0, 1, .3 ), { ambient: 1} ),
+        this.materials =     
+          { terrain:          context.get_instance( Phong_Shader ).material( Color.of( 0, 0, 1, .3 ), { ambient: 1} ),
+            ground:          context.get_instance( Fake_Bump_Map ).material( Color.of( 109/255, 78/255, 0/255, 1 ), { ambient: .40, texture: context.get_instance( "assets/ground_texture.jpeg", false ) } ),
             red:            context.get_instance( Phong_Shader ).material( Color.of( 1 ,0, 0 ,1 ), { ambient: 1 } ),
             green:          context.get_instance( Phong_Shader ).material( Color.of( 0 ,1, 0 ,1 ), { ambient: 1 } ),
             king_Fish:      context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/King_Of_The_Pond.png", false ) } ),
@@ -38,6 +40,8 @@ class Fishing_Game extends Scene_Component
             small_Fry:      context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Small_Fry.png", false ) } ),
             touchy_Fish:    context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Touchy_Fish.png", false ) } ),
             nibbler:        context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Nibbler.png", false ) } ),
+
+            tree: context.get_instance( Fake_Bump_Map ).material( Color.of( 0,.6,0,1 ), { ambient: .7, diffusivity: .5, specularity: .5 } )
           }
 
         this.lights = [ new Light( Vec.of( 0,5,5,1 ), Color.of( 0,1,1,1 ), 50 ) ];
@@ -123,14 +127,25 @@ class Fishing_Game extends Scene_Component
         this.nibbler_direction = -1;
         this.nibbler_caught = false;        
 
+                  // RENDER TERRAIN MATRIXES
         this.pond_Matrix = Mat4.identity();
         this.pond_Matrix = this.pond_Matrix.times( Mat4.translation([0, 0, 1]))
                                            .times( Mat4.scale([7, 7, .01]));
+        
+        this.ground_Matrix = Mat4.identity();
+        this.ground_Matrix = this.ground_Matrix.times( Mat4.translation([0, 0, 1]))
+                                           .times( Mat4.scale([40.6, 40.6, .01]));                                           
 
         this.bottom_Matrix = Mat4.identity();
         this.bottom_Matrix = this.bottom_Matrix.times( Mat4.translation([0, 0, -1]))
-                                           .times( Mat4.scale([10, 10, .01]));
+                                           .times( Mat4.scale([15, 15, .01]));
 
+        this.tree_Matrix = Mat4.identity();
+        this.tree_Matrix = this.tree_Matrix.times( Mat4.rotation( 1.6, Vec.of( 1, 0, 0)))
+                                          .times( Mat4.translation([-10, 6.5, -7 ]))
+                                           .times( Mat4.scale([1.5, 1.5, 1.5]));
+                                          
+      
         this.catching = false;
         this.catching_timer = 0;  
 
@@ -311,7 +326,7 @@ class Fishing_Game extends Scene_Component
 
         //draw the bottom of the pond
 
-        this.shapes.sphere6.draw( graphics_state, this.bottom_Matrix, this.materials.phong.override( { color: Color.of( .5, .5, .5, 1) } ));
+        this.shapes.sphere6.draw( graphics_state, this.bottom_Matrix, this.materials.terrain.override( { color: Color.of( .5, .5, .5, 1) } ));
 
 
         // Draw Crosshairs
@@ -339,14 +354,20 @@ class Fishing_Game extends Scene_Component
             }
         }
             // Helper function to draw the fish
-            this.draw_the_fish(graphics_state, t)
+//             this.draw_the_fish(graphics_state, t)
 
 
             //this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
             //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
 
             // Draw flattened blue sphere for temporary pond:
-            this.shapes.torus.draw( graphics_state, this.pond_Matrix, this.materials.phong);
+            this.shapes.pond.draw( graphics_state, this.pond_Matrix, this.materials.terrain);
+
+            this.shapes.torus.draw( graphics_state, this.ground_Matrix, this.materials.ground);
+
+//             this.shapes.tree.draw( graphics_state, this.tree_Matrix, this.materials.tree);
+            this.shapes.tree_stem.draw( graphics_state, this.tree_Matrix, this.materials.tree.override( { color: Color.of( 60/255, 40/255, 5/255 )}));
+            this.shapes.tree_leaves.draw( graphics_state, this.tree_Matrix, this.materials.tree);
       }
 
 
@@ -382,7 +403,7 @@ class Fishing_Game extends Scene_Component
 
             if(t > this.king_spawn_time + 0.2)
             {
-                king_model_transform = this.king_Fish_Matrix.times( Mat4.translation([(6 / (t - this.king_dist)) * (0.05) * Math.cos(this.king_angle), (6 / (t - this.king_dist)) * (0.05) * Math.sin(this.king_angle), 0]));
+//                 king_model_transform = this.king_Fish_Matrix.times( Mat4.translation([(6 / (t - this.king_dist)) * (0.05) * Math.cos(this.king_angle), (6 / (t - this.king_dist)) * (0.05) * Math.sin(this.king_angle), 0]));
 
                 if( 6 / (t - this.king_dist) < 0.6)
                 {
