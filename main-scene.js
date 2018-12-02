@@ -35,7 +35,7 @@ class Fishing_Game extends Scene_Component
                          plane:     new Square(),
                          sphere6:   new Subdivision_Sphere(6),
                          pond:      new ( Circle.prototype.make_flat_shaded_version() ) ( 20, 20), 
-                         torus:     new ( Torus.prototype.make_flat_shaded_version() )( 20, 20 ) ,
+                         torus:     new Torus( 20, 20 ) ,
                          cylinder:  new Capped_Cylinder(20, 20),
                          tree_stem: new Shape_From_File( "assets/MapleTreeStem.obj" ),
                          tree_leaves: new Shape_From_File( "assets/MapleTreeLeaves.obj" ),
@@ -162,7 +162,7 @@ class Fishing_Game extends Scene_Component
         
         this.ground_Matrix = Mat4.identity();
         this.ground_Matrix = this.ground_Matrix.times( Mat4.translation([0, 0, 1]))
-                                           .times( Mat4.scale([40.6, 40.6, .01]));                                           
+                                           .times( Mat4.scale([42.6, 42.6, .01]));                                           
 
         this.bottom_Matrix = Mat4.identity();
         this.bottom_Matrix = this.bottom_Matrix.times( Mat4.translation([0, 0, -1]))
