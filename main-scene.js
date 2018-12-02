@@ -45,7 +45,7 @@ class Fishing_Game extends Scene_Component
         this.submit_shapes( context, shapes );
 
         this.materials =     
-          { terrain:          context.get_instance( Phong_Shader ).material( Color.of( 0, 0, 1, .3 ), { ambient: 1} ),
+          { terrain:          context.get_instance( Phong_Shader ).material( Color.of( 0, 123/255, 167/255, .3 ), { ambient: 0.3} ),
             ground:          context.get_instance( Fake_Bump_Map ).material( Color.of( 109/255, 78/255, 0/255, 1 ), { ambient: .40, texture: context.get_instance( "assets/ground_texture.jpeg", false ) } ),
             shadow:         context.get_instance(Shadow_Shader).material( Color.of( 1, 1, 1, 1 ), { ambient: 1, texture: this.texture } ),
             red:            context.get_instance( Phong_Shader ).material( Color.of( 1 ,0, 0 ,1 ), { ambient: 1 } ),
@@ -64,7 +64,7 @@ class Fishing_Game extends Scene_Component
             rock:           context.get_instance( Fake_Bump_Map ).material( Color.of( 86/255, 64/255, 29/255,1 ), { ambient: .5, diffusivity: 5, specularity: .5 , texture: context.get_instance( "assets/rock_tex.jpg", false )  } ),
           }
 
-        this.lights = [ new Light( Vec.of( 0,5,5,1 ), Color.of( 0,1,1,1 ), 50 ) ];
+        this.lights = [ new Light( Vec.of( 150,150,50,1 ), Color.of( 250/255,214/255,165/255,1 ), 50000 ) ];
 
         this.crosshair_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
         this.sphere1_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
@@ -490,7 +490,7 @@ class Fishing_Game extends Scene_Component
         //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
 
         // Draw flattened blue sphere for temporary pond:
-        this.shapes.pond.draw( graphics_state, this.pond_Matrix, this.materials.terrain);
+        this.shapes.pond.draw( graphics_state, this.pond_Matrix.times(Mat4.scale([1.05,1.05,1.05])), this.materials.terrain);
 
         this.shapes.torus.draw( graphics_state, this.ground_Matrix, this.materials.ground);
 
