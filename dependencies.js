@@ -794,7 +794,7 @@ class Shadow_Shader extends Shader         // THE DEFAULT SHADER: This uses the 
                                                                                       // Compute an initial (ambient) color:
           if( USE_TEXTURE )  {
             if (tex_color.xyz == vec3(0, 0, 0)) {
-              gl_FragColor = vec4( 1, 1, 1, 1 );
+              gl_FragColor = vec4( shapeColor.xyz * ambient, shapeColor.w );
             } else {
               gl_FragColor = vec4( 0, 0, 0, 1 ); 
             }

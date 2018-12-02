@@ -202,8 +202,8 @@ class Fishing_Game extends Scene_Component
             this.key_triggered_button( "Catch Fish", [ ";" ], this.catch_fish );              
         }
 
-        this.result_img = this.control_panel.appendChild( Object.assign( document.createElement( "img" ), 
-                { style:"width:200px; height:" + 200 * this.aspect_ratio + "px" } ) );
+//         this.result_img = this.control_panel.appendChild( Object.assign( document.createElement( "img" ), 
+//                 { style:"width:200px; height:" + 200 * this.aspect_ratio + "px" } ) );
                 
       }
     
