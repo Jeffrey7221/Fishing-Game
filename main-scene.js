@@ -184,8 +184,6 @@ class Fishing_Game extends Scene_Component
         this.rock_Matrix = Mat4.identity().times( Mat4.rotation( 1.6, Vec.of( 0, 1, -.1)))
                                           .times( Mat4.translation([ -1.6, -7, 11 ]))
                                           .times (Mat4.scale([1.6, 1.6, 1.6]));
-                                            
-
       
         this.catching = false;
         this.catching_timer = 0;  
@@ -423,14 +421,16 @@ class Fishing_Game extends Scene_Component
 
               //transforming camera back
               graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10,0 ) );
-              
-              this.draw_the_fish(graphics_state, t)
-
 
               // Draw the bottom of the pond
               this.shapes.sphere6.draw( graphics_state, this.bottom_Matrix, this.materials.shadow);
 
+              this.gl.depthMask(false);
 
+              this.draw_the_fish(graphics_state, t)
+              
+              this.gl.depthMask(true);
+              
               // Draw Crosshairs
               if(!this.catching)
               {
@@ -511,7 +511,8 @@ class Fishing_Game extends Scene_Component
               this.shapes.cylinder.draw( graphics_state, this.cylinder_Matrix, this.materials.white.override( { color: Color.of( .7, .7, .7, .5) } ));
 
         }
-
+        this.gl.depthMask(true);    
+        
         //this.shapes.plane.draw( graphics_state, this.touchy_Fish_Matrix,        this.materials.touchy_Fish         );
         //this.shapes.plane.draw( graphics_state, this.nibbler_Matrix,            this.materials.nibbler             );
 
