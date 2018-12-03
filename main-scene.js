@@ -309,7 +309,6 @@ class Fishing_Game extends Scene_Component
             this.plain_Fish_Matrix[1][3] = this.crosshair_Matrix[1][3]-.5;
             this.plain_Fish_Matrix = this.plain_Fish_Matrix.times( Mat4.scale([.5, .5, .5]));
             this.caught_fish_matrix = this.plain_Fish_Matrix;
-            console.log("plain");
         }
         else if(Math.abs((this.plain1_Fish_Matrix[0][3] + 0.25 * Math.cos(this.plain1_angle)) - x) < 1 && Math.abs((this.plain1_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain1_angle)) - y) < 1)
         {
@@ -323,7 +322,6 @@ class Fishing_Game extends Scene_Component
             this.plain1_Fish_Matrix[1][3] = this.crosshair_Matrix[1][3]-.5;
             this.plain1_Fish_Matrix = this.plain1_Fish_Matrix.times( Mat4.scale([.5, .5, .5]));
             this.caught_fish_matrix = this.plain1_Fish_Matrix;
-            console.log("plain1");
         }
         else if(Math.abs((this.plain2_Fish_Matrix[0][3] + 0.25 * Math.cos(this.plain2_angle)) - x) < 1 && Math.abs((this.plain2_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain2_angle)) - y) < 1)
         {
@@ -337,7 +335,6 @@ class Fishing_Game extends Scene_Component
             this.plain2_Fish_Matrix[1][3] = this.crosshair_Matrix[1][3]-.5;
             this.plain2_Fish_Matrix = this.plain2_Fish_Matrix.times( Mat4.scale([.5, .5, .5]));
             this.caught_fish_matrix = this.plain2_Fish_Matrix;
-            console.log("plain2");
         }
         else if(Math.abs((this.small_Fry_Matrix[0][3] + 0.15 * Math.cos(this.fry_angle)) -x) < 1 && Math.abs((this.small_Fry_Matrix[1][3] + 0.15 * Math.sin(this.fry_angle)) - y) < 1)
         {
@@ -673,7 +670,6 @@ class Fishing_Game extends Scene_Component
             }
       }
        caught_fish_camera(graphics_state, fish_matrix, t) {
-            console.log(this.start_zoom);
             if((t - this.start_zoom) <=  3) {
                   var desired = Mat4.identity().times(Mat4.rotation(1.6, [1, 0, 0]));
                   desired[0][3] = fish_matrix[0][3];desired[1][3] = fish_matrix[1][3];desired[2][3] = fish_matrix[2][3];
@@ -682,7 +678,6 @@ class Fishing_Game extends Scene_Component
                   graphics_state.camera_transform = desired; 
                   this.storedCamera = graphics_state.camera_transform;
             }  else {
-                  console.log("asdf");
                   this.fish_is_caught = false;
                   this.caught_fish_matrix[0][3] = 100;
                   this.caught_fish_matrix[1][3] = 100;
