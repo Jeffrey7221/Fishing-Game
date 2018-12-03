@@ -74,7 +74,6 @@ class Fishing_Game extends Scene_Component
         this.cylinder_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
 
         this.king_Fish_Matrix = Mat4.identity().times( Mat4.translation([0, 0, -0.15]));  
-        this.king_Fish_Matrix = this.king_Fish_Matrix.times( Mat4.rotation(3.2,  Vec.of(0, 0, 1)));
         this.king_angle = 0
         this.king_model_spawn = Mat4.identity().times( Mat4.scale([.2, .05, .2]));
         this.king_spawn_time = Math.random() * 12 + 1;
@@ -164,7 +163,7 @@ class Fishing_Game extends Scene_Component
          
         this.pond_Matrix = Mat4.identity();
         this.pond_Matrix = this.pond_Matrix.times( Mat4.translation([0, 0, 1]))
-                                           .times( Mat4.scale([7, 7, -.01]));
+                                           .times( Mat4.scale([7, 7, .01]));
         
         this.ground_Matrix = Mat4.identity();
         this.ground_Matrix = this.ground_Matrix.times( Mat4.translation([0, 0, 1]))
@@ -226,7 +225,7 @@ class Fishing_Game extends Scene_Component
     
     move_left()
      {
-        if((this.crosshair_Matrix[0][3] - 0.2) * (this.crosshair_Matrix[0][3] - 0.2) + (this.crosshair_Matrix[1][3]) * (this.crosshair_Matrix[1][3]) < 72.25 && !this.fish_is_caught)
+        if((this.crosshair_Matrix[0][3] - 0.2) * (this.crosshair_Matrix[0][3] - 0.2) + (this.crosshair_Matrix[1][3]) * (this.crosshair_Matrix[1][3]) < 72.25 && !this.catching)
         {
             this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([-0.2, 0, 0]));       
         } 
@@ -234,7 +233,7 @@ class Fishing_Game extends Scene_Component
 
     move_right()
      {
-        if((this.crosshair_Matrix[0][3] + 0.2) * (this.crosshair_Matrix[0][3] + 0.2) + (this.crosshair_Matrix[1][3]) * (this.crosshair_Matrix[1][3]) < 72.25 && !this.fish_is_caught)
+        if((this.crosshair_Matrix[0][3] + 0.2) * (this.crosshair_Matrix[0][3] + 0.2) + (this.crosshair_Matrix[1][3]) * (this.crosshair_Matrix[1][3]) < 72.25 && !this.catching)
         {
             this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0.2, 0, 0]));
         }           
@@ -242,7 +241,7 @@ class Fishing_Game extends Scene_Component
 
     move_up()
      {
-        if((this.crosshair_Matrix[0][3]) * (this.crosshair_Matrix[0][3]) + (this.crosshair_Matrix[1][3] + 0.2) * (this.crosshair_Matrix[1][3] + 0.2) < 72.25 && !this.fish_is_caught)
+        if((this.crosshair_Matrix[0][3]) * (this.crosshair_Matrix[0][3]) + (this.crosshair_Matrix[1][3] + 0.2) * (this.crosshair_Matrix[1][3] + 0.2) < 72.25 && !this.catching)
         {
             this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, 0.2, 0]));
         }          
@@ -250,7 +249,7 @@ class Fishing_Game extends Scene_Component
 
     move_down()
      {
-        if((this.crosshair_Matrix[0][3]) * (this.crosshair_Matrix[0][3]) + (this.crosshair_Matrix[1][3] - 0.2) * (this.crosshair_Matrix[1][3] - 0.2) < 72.25 && !this.fish_is_caught)
+        if((this.crosshair_Matrix[0][3]) * (this.crosshair_Matrix[0][3]) + (this.crosshair_Matrix[1][3] - 0.2) * (this.crosshair_Matrix[1][3] - 0.2) < 72.25 && !this.catching)
         {
             this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, -0.2, 0]));
         }           
@@ -379,7 +378,7 @@ class Fishing_Game extends Scene_Component
         else if(Math.abs((this.small_Fry3_Matrix[0][3] + 0.15 * Math.cos(this.fry3_angle)) -x) < 1 && Math.abs((this.small_Fry3_Matrix[1][3] + 0.15 * Math.sin(this.fry3_angle)) - y) < 1)
         {
             this.fry3_caught = true;
-                        this.fish_is_caught = true;   
+            this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry
             this.small_Fry3_Matrix[0][0] = 0;this.small_Fry3_Matrix[0][1] = -1;
             this.small_Fry3_Matrix[1][0] = 1;this.small_Fry3_Matrix[1][1] = 0;
@@ -392,7 +391,7 @@ class Fishing_Game extends Scene_Component
         else if(Math.abs((this.small_Fry4_Matrix[0][3] + 0.15 * Math.cos(this.fry4_angle)) -x) < 1 && Math.abs((this.small_Fry4_Matrix[1][3] + 0.15 * Math.sin(this.fry4_angle)) - y) < 1)
         {
             this.fry4_caught = true;
-                        this.fish_is_caught = true;   
+            this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry
             this.small_Fry4_Matrix[0][0] = 0;this.small_Fry4_Matrix[0][1] = -1;
             this.small_Fry4_Matrix[1][0] = 1;this.small_Fry4_Matrix[1][1] = 0;
