@@ -170,8 +170,8 @@ class Fishing_Game extends Scene_Component
 
         this.bottom_Matrix = Mat4.identity();
         this.bottom_Matrix = this.bottom_Matrix.times( Mat4.translation([0, 0, -1]))
-                                           .times( Mat4.scale([15, 15, .01]));
-//                                            .times( Mat4.rotation(Math.PI, [1,0,0]) );
+                                           .times( Mat4.scale([15, 15, .01]))
+                                           .times( Mat4.rotation(Math.PI, [1.3,0,0]) );
 
         this.tree_Matrix = Mat4.identity();
         this.tree_Matrix = this.tree_Matrix.times( Mat4.rotation( 1.6, Vec.of( 1, 0, 0)))
@@ -193,7 +193,7 @@ class Fishing_Game extends Scene_Component
         this.pause = true;
         this.time = 0;            
            
-        this.beginning_animation = true;
+        this.beginning_animation = false;
         this.begin_animation = false;
         this.animation_t = 0;
         this.graphics_state = context.globals.graphics_state;
@@ -401,8 +401,8 @@ class Fishing_Game extends Scene_Component
         const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;
         this.time = t;
         if(this.beginning_animation) {
-              if(!this.begin_animation)
-                  graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -5, 1030 ), Vec.of( 0, 100, 0 ), Vec.of( 0, 10, 0 ) );
+//               if(!this.begin_animation)
+//                   graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -5, 1030 ), Vec.of( 0, 100, 0 ), Vec.of( 0, 10, 0 ) );
               this.shapes.plane.draw(graphics_state, this.sign_Matrix, this.materials.start_sign);
               if(this.begin_animation)
                   this.trigger_animation(graphics_state)
@@ -411,7 +411,7 @@ class Fishing_Game extends Scene_Component
         if(!this.beginning_animation) {
               // ***************************** Shadow Map *********************************
               // Helper function to draw the fish - Scene 1
-//               graphics_state.camera_transform =  Mat4.look_at( Vec.of( 0,5,40,1 ), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
+              graphics_state.camera_transform =  Mat4.look_at( Vec.of( 0,5,40,1 ), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
               this.draw_the_fish(graphics_state, t)
               //transforming camera to light source
 
@@ -422,7 +422,7 @@ class Fishing_Game extends Scene_Component
               //  ******************************* End Shadow Map ****************************
 
               //transforming camera back
-//               graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
+              graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
               this.draw_the_fish(graphics_state, t)
 
 
