@@ -833,7 +833,7 @@ class Shadow_Shader extends Shader         // THE DEFAULT SHADER: This uses the 
             return;
           }                                 
 
-           vec3 shadowCoord = (v_PositionFromLight.xyz/v_PositionFromLight.w)/2.0 + 0.5;
+//            vec3 shadowCoord = (v_PositionFromLight.xyz/v_PositionFromLight.w)/2.0 + 0.5;
 //            vec4 rgbaDepth = texture2D(texture, v_PositionFromLight.xy);
 
 //            float depth = rgbaDepth.r;
@@ -852,7 +852,7 @@ class Shadow_Shader extends Shader         // THE DEFAULT SHADER: This uses the 
 
           // If we get this far, calculate Smooth "Phong" Shading as opposed to Gouraud Shading.
                                             // Phong shading is not to be confused with the Phong Reflection Model.
-            vec4 tex_color = texture2D( texture, shadowCoord.xy );        // Sample the texture image in the correct place.
+            vec4 tex_color = texture2D( texture, f_tex_coord );        // Sample the texture image in the correct place.
 
             if( USE_TEXTURE && tex_color.w < .01 ) discard;
           

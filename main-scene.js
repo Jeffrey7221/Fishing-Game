@@ -429,7 +429,7 @@ class Fishing_Game extends Scene_Component
 
 
               // Draw the bottom of the pond
-              this.shapes.pond.draw( graphics_state, this.bottom_Matrix, this.materials.shadow);
+              this.shapes.sphere6.draw( graphics_state, this.bottom_Matrix, this.materials.shadow);
 
 
               // Draw Crosshairs
