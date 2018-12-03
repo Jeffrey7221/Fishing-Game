@@ -742,6 +742,12 @@ class Shadow_Shader extends Shader         // THE DEFAULT SHADER: This uses the 
 
         uniform mat4 camera_transform, camera_model_transform, projection_camera_model_transform;
         uniform mat3 inverse_transpose_modelview;
+        uniform mat4 s_camera_transform_loc;
+
+        uniform mat4 u_MvpMatrixFromLight;
+        varying vec4 v_PositionFromLight;
+        attribute vec4 a_Color;
+        varying vec4 v_Color;
 
         void main()
         { gl_Position = projection_camera_model_transform * vec4(object_space_pos, 1.0);     // The vertex's final resting place (in NDCS).
@@ -774,6 +780,42 @@ class Shadow_Shader extends Shader         // THE DEFAULT SHADER: This uses the 
             VERTEX_COLOR      = vec4( shapeColor.xyz * ambient, shapeColor.w);
             VERTEX_COLOR.xyz += phong_model_lights( N );
           }
+          
+           vec3 from = vec3(1,0,60);
+           vec3 to = vec3(0,0,0);
+           vec3 forward = normalize(from - to);
+           vec3 right = vec3(0,1,0) * forward;
+           vec3 up = forward * right;
+
+           mat4 camToWorld;
+
+           camToWorld[0][0] = right.x; 
+           camToWorld[0][1] = right.y; 
+           camToWorld[0][2] = right.z; 
+           camToWorld[1][0] = up.x; 
+           camToWorld[1][1] = up.y; 
+           camToWorld[1][2] = up.z; 
+           camToWorld[2][0] = forward.x; 
+           camToWorld[2][1] = forward.y; 
+           camToWorld[2][2] = forward.z; 
+
+           camToWorld[3][0] = from.x; 
+           camToWorld[3][1] = from.y; 
+           camToWorld[3][2] = from.z;
+
+          float l = -20.;
+          float r = 20.;
+          float t = 20.;
+          float b = -20.;
+          float n = -10.;
+          float f = 20.;
+          mat4 depthProjectionMatrix = mat4(2./(r-l), 0., 0., 0., 0., 2./(t-b), 0., 0., 0., 0., -2./(f-n), 0., -(r+l)/(r-l), -(t+b)/(t-b), -(f+n)/(f-n), 1.);
+
+          mat4 depthMVP = depthProjectionMatrix * camToWorld * mat4(1.0);
+          mat4 biasMatrix = mat4(0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0);
+          mat4 depthBiasMVP = biasMatrix * depthMVP;
+          v_PositionFromLight = biasMatrix * vec4(object_space_pos, 1.0);
+          v_Color = vec4( shapeColor.xyz * ambient, shapeColor.w);
         }`;
     }
   fragment_glsl_code()           // ********* FRAGMENT SHADER ********* 
@@ -781,29 +823,52 @@ class Shadow_Shader extends Shader         // THE DEFAULT SHADER: This uses the 
                                  // Fragments affect the final image or get discarded due to depth.
       return `
         uniform sampler2D texture;
+
+        varying vec4 v_PositionFromLight;
+        varying vec4 v_Color;
+
         void main()
         { if( GOURAUD || COLOR_NORMALS )    // Do smooth "Phong" shading unless options like "Gouraud mode" are wanted instead.
           { gl_FragColor = VERTEX_COLOR;    // Otherwise, we already have final colors to smear (interpolate) across vertices.            
             return;
-          }                                 // If we get this far, calculate Smooth "Phong" Shading as opposed to Gouraud Shading.
-                                            // Phong shading is not to be confused with the Phong Reflection Model.
-          vec4 tex_color = texture2D( texture, f_tex_coord );                         // Sample the texture image in the correct place.
+          }                                 
 
-          if( USE_TEXTURE && tex_color.w < .01 ) discard;
+           vec3 shadowCoord = (v_PositionFromLight.xyz/v_PositionFromLight.w)/2.0 + 0.5;
+//            vec4 rgbaDepth = texture2D(texture, v_PositionFromLight.xy);
+
+//            float depth = rgbaDepth.r;
+//            float visibility = (shadowCoord.z > depth + 0.005) ? 0.7 : 1.0;
+
+
+//            if (rgbaDepth.xyz == vec3(0, 0, 0)) {
+//               gl_FragColor = vec4( shapeColor.xyz * ambient, shapeColor.w );
+//              gl_FragColor = vec4( 0, 0, 0, 1 ); 
+//             } else {
+//               gl_FragColor = vec4( 0, 0, 0, 1 ); 
+//             }
+//            gl_FragColor = vec4(v_Color.rgb * visibility, v_Color.a);
+//           gl_FragColor = rgbaDepth;
+//           gl_FragColor = vec4( 1, 1, 1, 1 );
+
+          // If we get this far, calculate Smooth "Phong" Shading as opposed to Gouraud Shading.
+                                            // Phong shading is not to be confused with the Phong Reflection Model.
+            vec4 tex_color = texture2D( texture, shadowCoord.xy );        // Sample the texture image in the correct place.
+
+            if( USE_TEXTURE && tex_color.w < .01 ) discard;
           
-                                                                                      // Compute an initial (ambient) color:
-          if( USE_TEXTURE )  {
-            if (tex_color.xyz == vec3(0, 0, 0)) {
-              gl_FragColor = vec4( shapeColor.xyz * ambient, shapeColor.w );
-            } else {
-              gl_FragColor = vec4( 0, 0, 0, 1 ); 
+                                                                                        // Compute an initial (ambient) color:
+            if( USE_TEXTURE )  {
+              if (tex_color.xyz == vec3(0, 0, 0)) {
+                gl_FragColor = vec4( shapeColor.xyz * ambient, shapeColor.w );
+              } else {
+                gl_FragColor = vec4( 0, 0, 0, 1 ); 
+              }
             }
-          }
-          else {
-            gl_FragColor = vec4( shapeColor.xyz * ambient, shapeColor.w );
-          }
-          gl_FragColor.xyz += phong_model_lights( N );                     // Compute the final color with contributions from lights.
-        }`;
+            else {
+              gl_FragColor = vec4( shapeColor.xyz * ambient, shapeColor.w );
+            }
+            gl_FragColor.xyz += phong_model_lights( N );                     // Compute the final color with contributions from lights.
+         }`;
     }
     // Define how to synchronize our JavaScript's variables to the GPU's:
   update_GPU( g_state, model_transform, material, gpu = this.g_addrs, gl = this.gl )
@@ -853,7 +918,8 @@ class Shadow_Shader extends Shader         // THE DEFAULT SHADER: This uses the 
       gl.uniformMatrix4fv( gpu.camera_transform_loc,                  false, Mat.flatten_2D_to_1D(     C .transposed() ) );
       gl.uniformMatrix4fv( gpu.camera_model_transform_loc,            false, Mat.flatten_2D_to_1D(     CM.transposed() ) );
       gl.uniformMatrix4fv( gpu.projection_camera_model_transform_loc, false, Mat.flatten_2D_to_1D(    PCM.transposed() ) );
-      gl.uniformMatrix3fv( gpu.inverse_transpose_modelview_loc,       false, Mat.flatten_2D_to_1D( inv_CM              ) );       
+      gl.uniformMatrix3fv( gpu.inverse_transpose_modelview_loc,       false, Mat.flatten_2D_to_1D( inv_CM              ) );  
+      gl.uniformMatrix4fv( gpu.s_camera_transform_loc,                false, Mat.flatten_2D_to_1D( Mat4.look_at( Vec.of( 20,20,40,1 ), Vec.of( 0,0,0 ), Vec.of( 0,1,0 )).transposed() ) );  
     }
 }
 
