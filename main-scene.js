@@ -64,7 +64,7 @@ class Fishing_Game extends Scene_Component
             rock:           context.get_instance( Fake_Bump_Map ).material( Color.of( 86/255, 64/255, 29/255,1 ), { ambient: .5, diffusivity: 5, specularity: .5 , texture: context.get_instance( "assets/rock_tex.jpg", false )  } ),
           }
 
-        this.lights = [ new Light( Vec.of( 1, 0, 60, 1 ), Color.of( 250/255,214/255,165/255,1 ), 5000 ) ];
+        this.lights = [ new Light( Vec.of( 0, 5, 40, 1 ), Color.of( 250/255,214/255,165/255,1 ), 1000 ) ];
 
         this.crosshair_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
         this.sphere1_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
@@ -218,8 +218,8 @@ class Fishing_Game extends Scene_Component
             this.key_triggered_button( "Catch Fish", [ ";" ], () => { if(!this.fish_is_caught) this.catch_fish() } );              
         }
 
-        this.result_img = this.control_panel.appendChild( Object.assign( document.createElement( "img" ), 
-                { style:"width:200px; height:" + 200 * this.aspect_ratio + "px" } ) );
+//         this.result_img = this.control_panel.appendChild( Object.assign( document.createElement( "img" ), 
+//                 { style:"width:200px; height:" + 200 * this.aspect_ratio + "px" } ) );
                 
       }
     
@@ -523,13 +523,14 @@ class Fishing_Game extends Scene_Component
         if(!this.beginning_animation) {
               // ***************************** Shadow Map *********************************
               // Helper function to draw the fish - Scene 1
-              graphics_state.camera_transform =  Mat4.look_at( Vec.of( 0,5,40,1 ), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
+              graphics_state.camera_transform =  Mat4.look_at( Vec.of( 0,5,40,1), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
+
               this.draw_the_fish(graphics_state, t)
               //transforming camera to light source
 
               this.scratchpad_context.drawImage( this.webgl_manager.canvas, 0, 0, 256, 256 );
               this.texture.image.src = this.scratchpad.toDataURL("image/png");        // Clear the canvas and start over, beginning scene 2:
-              this.texture.image.src = this.result_img.src = this.scratchpad.toDataURL("image/png");
+//               this.texture.image.src = this.result_img.src = this.scratchpad.toDataURL("image/png");
               this.webgl_manager.gl.clear( this.webgl_manager.gl.COLOR_BUFFER_BIT | this.webgl_manager.gl.DEPTH_BUFFER_BIT);
               //  ******************************* End Shadow Map ****************************
 
