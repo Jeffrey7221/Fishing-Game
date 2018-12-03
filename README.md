@@ -27,3 +27,8 @@ If you are using a Mac, run "host.command", and if you are running a Windows, ru
 
 ## Target Audience:
 Our project is a game, and is hence targeted towards any individual wishing to play a fishing game.
+
+## Advanced Features:
+Transparency
+Shadows and Shadow Mapping
+OBJ Model Loader
