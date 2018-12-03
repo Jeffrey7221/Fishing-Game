@@ -201,10 +201,10 @@ class Fishing_Game extends Scene_Component
 
     make_control_panel()
       { 
-        this.key_triggered_button( "Move Left", [ "j" ], this.move_left );
-        this.key_triggered_button( "Move Right", [ "l" ], this.move_right );
-        this.key_triggered_button( "Move Up", [ "i" ], this.move_up );
-        this.key_triggered_button( "Move Down", [ "k" ], this.move_down );
+        this.key_triggered_button( "Move Left", [ "a" ], this.move_left );
+        this.key_triggered_button( "Move Right", [ "d" ], this.move_right );
+        this.key_triggered_button( "Move Up", [ "w" ], this.move_up );
+        this.key_triggered_button( "Move Down", [ "s" ], this.move_down );
         this.key_triggered_button( "Start Game", [ "m" ], () => { if(!this.begin_animation)
                                                                   this.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -40, 30 ), Vec.of( 0, 0, 0 ), Vec.of( 0, 10, 0 ) );
                                                                   this.begin_animation = true;
@@ -643,28 +643,7 @@ class Fishing_Game extends Scene_Component
                         }
 
                         this.mystery_Fish_Matrix = mystery_model_transform;
-
-                        var current_mystery = Math.atan2( (this.mystery_Fish_Matrix[1][3]) , (this.mystery_Fish_Matrix[0][3]) );
-
-                        if(current_mystery < 0)
-                        {
-                              current_mystery += 2 * Math.PI;
-                        }
-
-                        if(current_mystery >= 2 * Math.PI)
-                        {
-                              current_mystery -= 2 * Math.PI;
-                        }
-
-                        if(current_mystery <= this.mystery_angle) 
-                        {
-                              current_mystery += 0.4;
-                              mystery_model_transform[0][0] = Math.cos(current_mystery);
-                              mystery_model_transform[0][1] = -Math.sin(current_mystery);
-                              mystery_model_transform[1][0] = Math.sin(current_mystery);
-                              mystery_model_transform[1][1] = Math.cos(current_mystery);
-                        } 
-                        //mystery_model_transform = mystery_model_transform.times( Mat4.rotation( this.mystery_angle, Vec.of(0, 0, 1)))
+                        mystery_model_transform = mystery_model_transform.times( Mat4.rotation( this.mystery_angle, Vec.of(0, 0, 1)))
                         mystery_model_transform = mystery_model_transform.times( Mat4.scale([2, .5, 2]));
                         this.shapes.plane.draw( graphics_state, mystery_model_transform, this.materials.mystery_Fish);
                   } 
