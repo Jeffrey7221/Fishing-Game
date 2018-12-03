@@ -422,7 +422,8 @@ class Fishing_Game extends Scene_Component
               //  ******************************* End Shadow Map ****************************
 
               //transforming camera back
-//               graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
+              graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10,0 ) );
+              
               this.draw_the_fish(graphics_state, t)
 
 
@@ -642,7 +643,28 @@ class Fishing_Game extends Scene_Component
                         }
 
                         this.mystery_Fish_Matrix = mystery_model_transform;
-                        mystery_model_transform = mystery_model_transform.times( Mat4.rotation( this.mystery_angle, Vec.of(0, 0, 1)))
+
+                        var current_mystery = Math.atan2( (this.mystery_Fish_Matrix[1][3]) , (this.mystery_Fish_Matrix[0][3]) );
+
+                        if(current_mystery < 0)
+                        {
+                              current_mystery += 2 * Math.PI;
+                        }
+
+                        if(current_mystery >= 2 * Math.PI)
+                        {
+                              current_mystery -= 2 * Math.PI;
+                        }
+
+                        if(current_mystery <= this.mystery_angle) 
+                        {
+                              current_mystery += 0.4;
+                              mystery_model_transform[0][0] = Math.cos(current_mystery);
+                              mystery_model_transform[0][1] = -Math.sin(current_mystery);
+                              mystery_model_transform[1][0] = Math.sin(current_mystery);
+                              mystery_model_transform[1][1] = Math.cos(current_mystery);
+                        } 
+                        //mystery_model_transform = mystery_model_transform.times( Mat4.rotation( this.mystery_angle, Vec.of(0, 0, 1)))
                         mystery_model_transform = mystery_model_transform.times( Mat4.scale([2, .5, 2]));
                         this.shapes.plane.draw( graphics_state, mystery_model_transform, this.materials.mystery_Fish);
                   } 
