@@ -45,9 +45,9 @@ class Fishing_Game extends Scene_Component
         this.submit_shapes( context, shapes );
 
         this.materials =     
-          { pond:          context.get_instance( Phong_Shader ).material( Color.of( 0, 123/255, 167/255, .3 ), { ambient: 0.3} ),
+          { pond:          context.get_instance( Phong_Shader ).material( Color.of( 0, 123/255, 167/255, .5 ), { ambient: 0.3} ),
             ground:          context.get_instance( Fake_Bump_Map ).material( Color.of( 109/255, 78/255, 0/255, 1 ), { ambient: .40, texture: context.get_instance( "assets/ground_texture.jpeg", false ) } ),
-            shadow:         context.get_instance(Shadow_Shader).material( Color.of( 1, 1, 1, 1 ), { ambient: 1, texture: this.texture } ),
+            shadow:         context.get_instance(Shadow_Shader).material( Color.of( 71/255, 59/255, 51/255, 1 ), { ambient: 1, texture: this.texture } ),
             red:            context.get_instance( Phong_Shader ).material( Color.of( 1 ,0, 0 ,1 ), { ambient: 1 } ),
             green:          context.get_instance( Phong_Shader ).material( Color.of( 0 ,1, 0 ,1 ), { ambient: 1 } ),
             white:          context.get_instance( Phong_Shader ).material( Color.of( 1 ,1, 1 ,1 ), { ambient: 1 } ),  
@@ -155,6 +155,10 @@ class Fishing_Game extends Scene_Component
                   // RENDER TERRAIN MATRIXES
         this.sign_Matrix = Mat4.identity().times( Mat4.scale([10, 10, 10]))
                                           .times( Mat4.translation( [0, 0, 100 ]));
+
+        this.backdrop_Matrix = Mat4.identity().times( Mat4.translation([0, 100, 1]))
+                                              .times( Mat4.rotation( 1.6, Vec.of(1, 0, 0)))
+                                              .times( Mat4.scale([ 200, 100, 1]));
          
         this.pond_Matrix = Mat4.identity();
         this.pond_Matrix = this.pond_Matrix.times( Mat4.translation([0, 0, 1]))
@@ -166,8 +170,8 @@ class Fishing_Game extends Scene_Component
 
         this.bottom_Matrix = Mat4.identity();
         this.bottom_Matrix = this.bottom_Matrix.times( Mat4.translation([0, 0, -1]))
-                                           .times( Mat4.scale([15, 15, .01]))
-                                           .times( Mat4.rotation(Math.PI, [1,0,0]) );
+                                           .times( Mat4.scale([15, 15, .01]));
+//                                            .times( Mat4.rotation(Math.PI, [1,0,0]) );
 
         this.tree_Matrix = Mat4.identity();
         this.tree_Matrix = this.tree_Matrix.times( Mat4.rotation( 1.6, Vec.of( 1, 0, 0)))
@@ -190,6 +194,9 @@ class Fishing_Game extends Scene_Component
         this.time = 0;            
            
         this.beginning_animation = true;
+        this.begin_animation = false;
+        this.animation_t = 0;
+        this.graphics_state = context.globals.graphics_state;
       }
 
     make_control_panel()
@@ -198,7 +205,10 @@ class Fishing_Game extends Scene_Component
         this.key_triggered_button( "Move Right", [ "l" ], this.move_right );
         this.key_triggered_button( "Move Up", [ "i" ], this.move_up );
         this.key_triggered_button( "Move Down", [ "k" ], this.move_down );
-        this.key_triggered_button( "Start Game", [ "m" ], () => this.beginning_animation = false );
+        this.key_triggered_button( "Start Game", [ "m" ], () => { if(!this.begin_animation)
+                                                                  this.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -40, 30 ), Vec.of( 0, 0, 0 ), Vec.of( 0, 10, 0 ) );
+                                                                  this.begin_animation = true;
+                                                                });
         if(!this.catching)
         {
             this.key_triggered_button( "Catch Fish", [ ";" ], this.catch_fish );              
@@ -239,6 +249,15 @@ class Fishing_Game extends Scene_Component
         {
             this.crosshair_Matrix = this.crosshair_Matrix.times( Mat4.translation([0, -0.2, 0]));
         }           
+     }
+     trigger_animation(graphics_state) {
+          var desired = Mat4.look_at( Vec.of( 0, -20, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
+//           var desired = Mat4.inverse(Mat4.identity());
+          desired = desired.map((x, i) => Vec.from( graphics_state.camera_transform[i]).mix( x, .05));
+          graphics_state.camera_transform = desired; 
+          this.animation_t += 0.01;
+        if (this.animation_t >= 1)
+            this.beginning_animation = false;
      }
 
     catch_fish()
@@ -382,13 +401,17 @@ class Fishing_Game extends Scene_Component
         const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;
         this.time = t;
         if(this.beginning_animation) {
+              if(!this.begin_animation)
+                  graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -5, 1030 ), Vec.of( 0, 100, 0 ), Vec.of( 0, 10, 0 ) );
               this.shapes.plane.draw(graphics_state, this.sign_Matrix, this.materials.start_sign);
+              if(this.begin_animation)
+                  this.trigger_animation(graphics_state)
         }
 
         if(!this.beginning_animation) {
               // ***************************** Shadow Map *********************************
               // Helper function to draw the fish - Scene 1
-              graphics_state.camera_transform =  Mat4.look_at( Vec.of( 0,5,40,1 ), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
+//               graphics_state.camera_transform =  Mat4.look_at( Vec.of( 0,5,40,1 ), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
               this.draw_the_fish(graphics_state, t)
               //transforming camera to light source
 
@@ -399,7 +422,7 @@ class Fishing_Game extends Scene_Component
               //  ******************************* End Shadow Map ****************************
 
               //transforming camera back
-              graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
+//               graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -20, 15 ), Vec.of( 0,0,0 ), Vec.of( 0,10, 0 ) );
               this.draw_the_fish(graphics_state, t)
 
 
@@ -514,6 +537,7 @@ class Fishing_Game extends Scene_Component
         this.shapes.tree_leaves.draw( graphics_state, this.tree_Matrix1, this.materials.tree_leaves.override( { color: Color.of( .3,.6,.2,1 )}));
 
         this.shapes.rock.draw( graphics_state, this.rock_Matrix, this.materials.rock);
+        this.shapes.plane.draw( graphics_state, this.backdrop_Matrix, this.materials.pond.override( { color: Color.of( 147/255, 224/255, 1, 1), ambient: .8}));
       
       }
 
