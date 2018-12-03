@@ -283,7 +283,7 @@ class Fishing_Game extends Scene_Component
             this.king_Fish_Matrix[2][0] = 1;this.king_Fish_Matrix[2][1] = 0;
             this.king_Fish_Matrix[0][3] = this.crosshair_Matrix[0][3]+.30;
             this.king_Fish_Matrix[1][3] = this.crosshair_Matrix[1][3]-.70;  
-            this.caught_fish_matrix = this.king_Fish_Matrix.times(Mat4.scale([1, 0.5, 1]));
+            this.caught_fish_matrix = this.king_Fish_Matrix;
         }
         else if(Math.abs((this.mystery_Fish_Matrix[0][3] + Math.cos(this.mystery_angle)) - x) < 1 && Math.abs((this.mystery_Fish_Matrix[1][3] + Math.sin(this.mystery_angle)) - y) < 1)
         {
@@ -295,7 +295,7 @@ class Fishing_Game extends Scene_Component
             this.mystery_Fish_Matrix[2][0] = 1;this.mystery_Fish_Matrix[2][1] = 0;
             this.mystery_Fish_Matrix[0][3] = this.crosshair_Matrix[0][3];
             this.mystery_Fish_Matrix[1][3] = this.crosshair_Matrix[1][3]-1;  
-            this.caught_fish_matrix = this.mystery_Fish_Matrix.times(Mat4.scale([1, 0.5, 1]));;
+            this.caught_fish_matrix = this.mystery_Fish_Matrix;
         }
         else if(Math.abs((this.plain_Fish_Matrix[0][3] + 0.25 * Math.cos(this.plain_angle)) - x) < 1 && Math.abs((this.plain_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain_angle)) - y) < 1)
         {
@@ -407,7 +407,7 @@ class Fishing_Game extends Scene_Component
         else if(Math.abs((this.touchy_Fish_Matrix[0][3] + (0.25) * Math.cos(this.touchy_angle)) - x) < 1 && Math.abs((this.touchy_Fish_Matrix[1][3] + Math.sin(this.touchy_angle)) - y) < 1)
         {
             this.touchy_caught = true;
-            this.fish_is_caught = true;  
+            this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.touchy_Fish
             this.touchy_Fish_Matrix[0][0] = 0;this.touchy_Fish_Matrix[0][1] = -1;
             this.touchy_Fish_Matrix[1][0] = 1;this.touchy_Fish_Matrix[1][1] = 0;
@@ -659,36 +659,25 @@ class Fishing_Game extends Scene_Component
                   this.cylinder_Matrix[2][3] = this.cylinder_Matrix[2][3] + .02;
             }
             if(this.sphere1_Matrix[2][3] > 2) {
-//                   this.fish_is_caught = false;
-//                   this.caught_fish_matrix[0][3] = 100;
-//                   this.caught_fish_matrix[1][3] = 100;
-                  var fix_rotation = fish_matrix.times(Mat4.rotation(1, [0, -1, 0]));
-                  this.shapes.plane.draw( graphics_state, fix_rotation, this.caught_fish_material);
-                  this.zoom_animation = true;
-                  if(this.start_zoom == -1)  {
-                        this.start_zoom = t;
-                  }
-                  this.caught_fish_camera(graphics_state, fish_matrix, t);
+                  this.fish_is_caught = false;
+                  this.caught_fish_matrix[0][3] = 100;
+                  this.caught_fish_matrix[1][3] = 100;
+//                   var fix_rotation = fish_matrix.times(Mat4.rotation(1, [0, -1, 0]));
+//                   this.shapes.plane.draw( graphics_state, fix_rotation, this.caught_fish_material);
+//                   this.zoom_animation = true;
+//                   this.start_zoom = t;
+//                   this.caught_fish_camera(graphics_state, fish_matrix, t);
             }
       }
 
       caught_fish_camera(graphics_state, fish_matrix, t) {
-            console.log(this.start_zoom);
-            if((t - this.start_zoom) <=  3) {
-                  var desired = Mat4.identity().times(Mat4.rotation(1.6, [1, 0, 0]));
-                  desired[0][3] = fish_matrix[0][3];desired[1][3] = fish_matrix[1][3];desired[2][3] = fish_matrix[2][3];
-                   desired = Mat4.inverse(desired.times(Mat4.translation([0, 0, 5])));
-                  desired = desired.map((x, i) => Vec.from( graphics_state.camera_transform[i]).mix( x, .1));
-                  graphics_state.camera_transform = desired; 
-                  this.storedCamera = graphics_state.camera_transform;
-            }  else {
-                  console.log("asdf");
-                  this.fish_is_caught = false;
-                  this.caught_fish_matrix[0][3] = 100;
-                  this.caught_fish_matrix[1][3] = 100;
-                  this.zoom_animation = false;
-                  this.start_zoom = -1;
-            }
+            if(this.sta)
+            var desired = Mat4.identity().times(Mat4.rotation(1.6, [1, 0, 0]));
+            desired[0][3] = fish_matrix[0][3];desired[1][3] = fish_matrix[1][3];desired[2][3] = fish_matrix[2][3];
+             desired = Mat4.inverse(desired.times(Mat4.translation([0, 0, 5])));
+            desired = desired.map((x, i) => Vec.from( graphics_state.camera_transform[i]).mix( x, .1));
+            graphics_state.camera_transform = desired; 
+            this.storedCamera = graphics_state.camera_transform;
 
       }
           // *************************************************************************
