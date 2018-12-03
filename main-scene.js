@@ -201,11 +201,11 @@ class Fishing_Game extends Scene_Component
 
     make_control_panel()
       { 
-        this.key_triggered_button( "Move Left", [ "a" ], this.move_left );
-        this.key_triggered_button( "Move Right", [ "d" ], this.move_right );
-        this.key_triggered_button( "Move Up", [ "w" ], this.move_up );
-        this.key_triggered_button( "Move Down", [ "s" ], this.move_down );
-        this.key_triggered_button( "Start Game", [ "m" ], () => { if(!this.begin_animation)
+        this.key_triggered_button( "Move Left", [ "j" ], this.move_left );
+        this.key_triggered_button( "Move Right", [ "l" ], this.move_right );
+        this.key_triggered_button( "Move Up", [ "i" ], this.move_up );
+        this.key_triggered_button( "Move Down", [ "k" ], this.move_down );
+        this.key_triggered_button( "Start Game", [ "m" ], () => { if(!this.begin_animation)     
                                                                   this.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -40, 30 ), Vec.of( 0, 0, 0 ), Vec.of( 0, 10, 0 ) );
                                                                   this.begin_animation = true;
                                                                 });
