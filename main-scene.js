@@ -42,8 +42,10 @@ class Fishing_Game extends Scene_Component
                          grass:     new Shape_From_File( "assets/Grass_03.obj"),
                          rock:      new Shape_From_File( "assets/Rock.obj"),
                          circle:    new Circle(),
+                         mText:      new Text_Line(35),
                        }
         this.submit_shapes( context, shapes );
+        this.shapes.mText.set_string("Nice!");
 
         this.materials =     
           { pond:          context.get_instance( Phong_Shader ).material( Color.of( 0, 123/255, 167/255, .5 ), { ambient: 0.3} ),
@@ -63,6 +65,7 @@ class Fishing_Game extends Scene_Component
             tree_leaves:    context.get_instance( Fake_Bump_Map ).material( Color.of( 0,.6,0,1 ), { ambient: .7, diffusivity: .5, specularity: .5 } ),
             tree_stem:      context.get_instance( Fake_Bump_Map ).material( Color.of( 70/255, 50/255, 5/255,1 ), { ambient: .9, diffusivity: .5, specularity: .5 } ),
             rock:           context.get_instance( Fake_Bump_Map ).material( Color.of( 86/255, 64/255, 29/255,1 ), { ambient: .5, diffusivity: 5, specularity: .5 , texture: context.get_instance( "assets/rock_tex.jpg", false )  } ),
+            text_image:        context.get_instance( Phong_Shader ).material( Color.of( 0,0,0,1 ), { ambient: 1, diffusivity: 0, specularity: 0, texture: context.get_instance( "/assets/text.png", false ) } ),
           }
 
         this.lights = [ new Light( Vec.of( 0, 5, 40, 1 ), Color.of( 250/255,214/255,165/255,1 ), 1000 ) ];
@@ -79,6 +82,8 @@ class Fishing_Game extends Scene_Component
         this.veiled_in_black.loop = true;
         this.veiled_in_black_volume = 0.5;
         this.veiled_in_black.volume = 0.5;
+        this.splash = new Audio("assets/splash.mp3");
+        this.splash.loop = false;
 
         this.crosshair_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
         this.sphere1_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
@@ -158,7 +163,7 @@ class Fishing_Game extends Scene_Component
         this.fry4_spawn_time = Math.random() * 8;
         this.fry4_caught = true;
 	
-        this.touchy_Fish_Matrix = Mat4.identity().times( Mat4.translation([0, 0, 0.1])).times(Mat4.scale([.5,.5,.5]));
+        this.touchy_Fish_Matrix = Mat4.identity().times( Mat4.translation([20, 20, 0.1])).times(Mat4.scale([.5,.5,.5]));
         this.touchy_angle = 0;
         this.touchy_model_spawn = Mat4.identity().times( Mat4.scale([.05, .05, .05]));
         this.touchy_spawn_time = Math.random() * 12 + 10;
@@ -224,7 +229,7 @@ class Fishing_Game extends Scene_Component
         this.pause = true;
         this.time = 0;            
            
-        this.beginning_animation = false;
+        this.beginning_animation = true;
         this.begin_animation = false;
         this.animation_t = 0;
         this.graphics_state = context.globals.graphics_state;
@@ -298,6 +303,7 @@ class Fishing_Game extends Scene_Component
 
         if(Math.abs((this.king_Fish_Matrix[0][3] + Math.cos(this.king_angle) - 0.3 * Math.sin(this.king_angle)) - x) < 2 && Math.abs((this.king_Fish_Matrix[1][3] + 0.3 * Math.cos(this.king_angle) + Math.sin(this.king_angle)) - y) < 2 && !this.king_caught)
         {
+            this.splash.play();
             this.king_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.king_Fish;
@@ -310,6 +316,7 @@ class Fishing_Game extends Scene_Component
         }
         else if(Math.abs((this.mystery_Fish_Matrix[0][3] + Math.cos(this.mystery_angle)) - x) < 1 && Math.abs((this.mystery_Fish_Matrix[1][3] + Math.sin(this.mystery_angle)) - y) < 1 && !this.mystery_caught)
         {
+            this.splash.play();
             this.mystery_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.mystery_Fish;
@@ -322,6 +329,7 @@ class Fishing_Game extends Scene_Component
         }
         else if(Math.abs((this.plain_Fish_Matrix[0][3] + 0.25 * Math.cos(this.plain_angle)) - x) < 1 && Math.abs((this.plain_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain_angle)) - y) < 1 && !this.plain_caught)
         {
+            this.splash.play();
             this.plain_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.plain_Fish;
@@ -335,6 +343,7 @@ class Fishing_Game extends Scene_Component
         }
         else if(Math.abs((this.plain1_Fish_Matrix[0][3] + 0.25 * Math.cos(this.plain1_angle)) - x) < 1 && Math.abs((this.plain1_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain1_angle)) - y) < 1 && !this.plain1_caught)
         {
+            this.splash.play();
             this.plain1_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.plain_Fish;
@@ -348,6 +357,7 @@ class Fishing_Game extends Scene_Component
         }
         else if(Math.abs((this.plain2_Fish_Matrix[0][3] + 0.25 * Math.cos(this.plain2_angle)) - x) < 1 && Math.abs((this.plain2_Fish_Matrix[1][3] + 0.25 * Math.sin(this.plain2_angle)) - y) < 1 && !this.plain2_caught)
         {
+            this.splash.play();
             this.plain2_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.plain_Fish;
@@ -361,6 +371,7 @@ class Fishing_Game extends Scene_Component
         }
         else if(Math.abs((this.small_Fry_Matrix[0][3] + 0.15 * Math.cos(this.fry_angle)) -x) < 1 && Math.abs((this.small_Fry_Matrix[1][3] + 0.15 * Math.sin(this.fry_angle)) - y) < 1 && !this.fry_caught)
         {
+            this.splash.play();
             this.fry_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry;
@@ -373,7 +384,8 @@ class Fishing_Game extends Scene_Component
             this.caught_fish_matrix = this.small_Fry_Matrix;
         }
         else if(Math.abs((this.small_Fry1_Matrix[0][3] + 0.15 * Math.cos(this.fry1_angle)) -x) < 1 && Math.abs((this.small_Fry1_Matrix[1][3] + 0.15 * Math.sin(this.fry1_angle)) - y) < 1 && !this.fry1_caught)
-        { 
+        {
+            this.splash.play(); 
             this.fry1_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry;
@@ -387,6 +399,7 @@ class Fishing_Game extends Scene_Component
         }
         else if(Math.abs((this.small_Fry2_Matrix[0][3] + 0.15 * Math.cos(this.fry2_angle)) -x) < 1 && Math.abs((this.small_Fry2_Matrix[1][3] + 0.15 * Math.sin(this.fry2_angle)) - y) < 1 && !this.fry2_caught)
         {
+            this.splash.play();
             this.fry2_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry;
@@ -400,6 +413,7 @@ class Fishing_Game extends Scene_Component
         }
         else if(Math.abs((this.small_Fry3_Matrix[0][3] + 0.15 * Math.cos(this.fry3_angle)) -x) < 1 && Math.abs((this.small_Fry3_Matrix[1][3] + 0.15 * Math.sin(this.fry3_angle)) - y) < 1 && !this.fry3_caught)
         {
+            this.splash.play();
             this.fry3_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry;
@@ -413,6 +427,7 @@ class Fishing_Game extends Scene_Component
         }
         else if(Math.abs((this.small_Fry4_Matrix[0][3] + 0.15 * Math.cos(this.fry4_angle)) -x) < 1 && Math.abs((this.small_Fry4_Matrix[1][3] + 0.15 * Math.sin(this.fry4_angle)) - y) < 1 && !this.fry4_caught)
         {
+            this.splash.play();
             this.fry4_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry;
@@ -426,6 +441,7 @@ class Fishing_Game extends Scene_Component
         }
         else if(Math.abs((this.touchy_Fish_Matrix[0][3] + (0.25) * Math.cos(this.touchy_angle)) - x) < 1 && Math.abs((this.touchy_Fish_Matrix[1][3] + Math.sin(this.touchy_angle)) - y) < 1 && !this.touchy_caught)
         {
+            this.splash.play();
             this.touchy_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.touchy_Fish;
@@ -439,6 +455,7 @@ class Fishing_Game extends Scene_Component
         }
         else if(Math.abs((this.nibbler_Matrix[0][3] + Math.cos(this.nibbler_angle)) - x) < 1 && Math.abs((this.nibbler_Matrix[1][3] + Math.sin(this.nibbler_angle)) - y) < 1 && !this.nibbler_caught)
         {
+            this.splash.play();
             this.nibbler_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.nibbler;
@@ -709,6 +726,8 @@ class Fishing_Game extends Scene_Component
                   }
                   this.caught_fish_camera(graphics_state, fish_matrix, t);
             }
+
+            this.shapes.mText.draw( graphics_state, fish_matrix.times(Mat4.rotation(3 * Math.PI/2, [0, 0, 1])).times(Mat4.translation([2,0,0])), this.materials.text_image );
       }
        caught_fish_camera(graphics_state, fish_matrix, t) {
             if((t - this.start_zoom) <=  3) {
