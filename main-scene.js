@@ -598,6 +598,17 @@ class Fishing_Game extends Scene_Component
         if(!this.beginning_animation && this.ending_animation) {
               graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -5, 1030 ), Vec.of( 0, 100, 0 ), Vec.of( 0, 10, 0 ) );
               this.shapes.plane.draw(graphics_state, this.sign_Matrix, this.materials.end_sign);
+	      if(this.veiled_in_black_volume > 0)
+               {
+                     this.veiled_in_black.volume = this.veiled_in_black_volume;
+                     this.veiled_in_black_volume = this.veiled_in_black_volume - 0.01;
+               }
+               if(this.veiled_in_black_volume <= 0 && this.fanfare_count == 0)
+               {
+                     this.veiled_in_black.pause();
+                     this.fanfare.play();
+                     this.fanfare_count = 1;
+               }
         }
 
         if(!this.beginning_animation && !this.ending_animation) {
