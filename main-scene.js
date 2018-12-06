@@ -67,12 +67,17 @@ class Fishing_Game extends Scene_Component
 
         this.lights = [ new Light( Vec.of( 0, 5, 40, 1 ), Color.of( 250/255,214/255,165/255,1 ), 1000 ) ];
 
+        this.t_reset = false;
+
         this.fanfare = new Audio("assets/Fanfare.flac");
+        this.fanfare.loop = false;
+        this.fanfare_count = 0;
         this.menu = new Audio("assets/Menu.flac");
         this.menu.loop = true;
         this.menu_volume = 0.5;
         this.veiled_in_black = new Audio("assets/Veiled in Black.flac");
         this.veiled_in_black.loop = true;
+        this.veiled_in_black_volume = 0.5;
         this.veiled_in_black.volume = 0.5;
 
         this.crosshair_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
@@ -229,6 +234,7 @@ class Fishing_Game extends Scene_Component
         this.key_triggered_button( "Start Game", [ "m" ], () => { if(!this.begin_animation)
                                                                   this.graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -40, 30 ), Vec.of( 0, 0, 0 ), Vec.of( 0, 10, 0 ) );
                                                                   this.begin_animation = true;
+                                                                  this.t_reset = false;
                                                                 });
         if(!this.catching)
         {
@@ -239,7 +245,7 @@ class Fishing_Game extends Scene_Component
 //                 { style:"width:200px; height:" + 200 * this.aspect_ratio + "px" } ) );
                 
       }
-    
+
     move_left()
      {
         if((this.crosshair_Matrix[0][3] - 0.2) * (this.crosshair_Matrix[0][3] - 0.2) + (this.crosshair_Matrix[1][3]) * (this.crosshair_Matrix[1][3]) < 72.25 && !this.catching)
@@ -292,7 +298,6 @@ class Fishing_Game extends Scene_Component
             this.king_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.king_Fish;
-            this.fanfare.play();
             this.king_Fish_Matrix[0][0] = 0;this.king_Fish_Matrix[0][1] = -1;
             this.king_Fish_Matrix[1][0] = 1;this.king_Fish_Matrix[1][1] = 0;
             this.king_Fish_Matrix[2][0] = 1;this.king_Fish_Matrix[2][1] = 0;
@@ -305,7 +310,6 @@ class Fishing_Game extends Scene_Component
             this.mystery_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.mystery_Fish;
-            this.fanfare.play();
             this.mystery_Fish_Matrix[0][0] = 0;this.mystery_Fish_Matrix[0][1] = -1;
             this.mystery_Fish_Matrix[1][0] = 1;this.mystery_Fish_Matrix[1][1] = 0;
             this.mystery_Fish_Matrix[2][0] = 1;this.mystery_Fish_Matrix[2][1] = 0;
@@ -318,7 +322,6 @@ class Fishing_Game extends Scene_Component
             this.plain_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.plain_Fish;
-            this.fanfare.play();
             this.plain_Fish_Matrix[0][0] = 0;this.plain_Fish_Matrix[0][1] = -1;
             this.plain_Fish_Matrix[1][0] = 1;this.plain_Fish_Matrix[1][1] = 0;
             this.plain_Fish_Matrix[2][0] = 1;this.plain_Fish_Matrix[2][1] = 0;
@@ -332,7 +335,6 @@ class Fishing_Game extends Scene_Component
             this.plain1_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.plain_Fish;
-            this.fanfare.play();
             this.plain1_Fish_Matrix[0][0] = 0;this.plain1_Fish_Matrix[0][1] = -1;
             this.plain1_Fish_Matrix[1][0] = 1;this.plain1_Fish_Matrix[1][1] = 0;
             this.plain1_Fish_Matrix[2][0] = 1;this.plain1_Fish_Matrix[2][1] = 0;
@@ -346,7 +348,6 @@ class Fishing_Game extends Scene_Component
             this.plain2_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.plain_Fish;
-            this.fanfare.play();
             this.plain2_Fish_Matrix[0][0] = 0;this.plain2_Fish_Matrix[0][1] = -1;
             this.plain2_Fish_Matrix[1][0] = 1;this.plain2_Fish_Matrix[1][1] = 0;
             this.plain2_Fish_Matrix[2][0] = 1;this.plain2_Fish_Matrix[2][1] = 0;
@@ -360,7 +361,6 @@ class Fishing_Game extends Scene_Component
             this.fry_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry;
-            this.fanfare.play();
             this.small_Fry_Matrix[0][0] = 0;this.small_Fry_Matrix[0][1] = -1;
             this.small_Fry_Matrix[1][0] = 1;this.small_Fry_Matrix[1][1] = 0;
             this.small_Fry_Matrix[2][0] = 1;this.small_Fry_Matrix[2][1] = 0;
@@ -374,7 +374,6 @@ class Fishing_Game extends Scene_Component
             this.fry1_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry;
-            this.fanfare.play();
             this.small_Fry1_Matrix[0][0] = 0;this.small_Fry1_Matrix[0][1] = -1;
             this.small_Fry1_Matrix[1][0] = 1;this.small_Fry1_Matrix[1][1] = 0;
             this.small_Fry1_Matrix[2][0] = 1;this.small_Fry1_Matrix[2][1] = 0;
@@ -388,7 +387,6 @@ class Fishing_Game extends Scene_Component
             this.fry2_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry;
-            this.fanfare.play();
             this.small_Fry2_Matrix[0][0] = 0;this.small_Fry2_Matrix[0][1] = -1;
             this.small_Fry2_Matrix[1][0] = 1;this.small_Fry2_Matrix[1][1] = 0;
             this.small_Fry2_Matrix[2][0] = 1;this.small_Fry2_Matrix[2][1] = 0;
@@ -402,7 +400,6 @@ class Fishing_Game extends Scene_Component
             this.fry3_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry;
-            this.fanfare.play();
             this.small_Fry3_Matrix[0][0] = 0;this.small_Fry3_Matrix[0][1] = -1;
             this.small_Fry3_Matrix[1][0] = 1;this.small_Fry3_Matrix[1][1] = 0;
             this.small_Fry3_Matrix[2][0] = 1;this.small_Fry3_Matrix[2][1] = 0;
@@ -416,7 +413,6 @@ class Fishing_Game extends Scene_Component
             this.fry4_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.small_Fry;
-            this.fanfare.play();
             this.small_Fry4_Matrix[0][0] = 0;this.small_Fry4_Matrix[0][1] = -1;
             this.small_Fry4_Matrix[1][0] = 1;this.small_Fry4_Matrix[1][1] = 0;
             this.small_Fry4_Matrix[2][0] = 1;this.small_Fry4_Matrix[2][1] = 0;
@@ -430,7 +426,6 @@ class Fishing_Game extends Scene_Component
             this.touchy_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.touchy_Fish;
-            this.fanfare.play();
             this.touchy_Fish_Matrix[0][0] = 0;this.touchy_Fish_Matrix[0][1] = -1;
             this.touchy_Fish_Matrix[1][0] = 1;this.touchy_Fish_Matrix[1][1] = 0;
             this.touchy_Fish_Matrix[2][0] = 1;this.touchy_Fish_Matrix[2][1] = 0;
@@ -444,7 +439,6 @@ class Fishing_Game extends Scene_Component
             this.nibbler_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.nibbler;
-            this.fanfare.play();
             this.nibbler_Matrix[0][0] = 0;this.nibbler_Matrix[0][1] = -1;
             this.nibbler_Matrix[1][0] = 1;this.nibbler_Matrix[1][1] = 0;
             this.nibbler_Matrix[2][0] = 1;this.nibbler_Matrix[2][1] = 0;
@@ -536,7 +530,7 @@ class Fishing_Game extends Scene_Component
     display( graphics_state )
       { 
         graphics_state.lights = this.lights;        
-        const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;
+        const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;  
         this.time = t;
         if(this.beginning_animation) {
               if(!this.begin_animation)
@@ -556,8 +550,7 @@ class Fishing_Game extends Scene_Component
                         this.menu.pause();
                         this.veiled_in_black.play();
                   }     
-              }
-                  
+              }    
         }
 
         if(!this.beginning_animation) {
@@ -1321,6 +1314,20 @@ class Fishing_Game extends Scene_Component
 
         // ***************************** END NIBBLER FISH *****************************
 
+        if(this.king_caught && this.mystery_caught && this.plain_caught && this.plain1_caught && this.plain2_caught && this.fry_caught && this.fry2_caught && this.fry3_caught && this.fry4_caught && this.touchy_caught && this.nibbler_caught)
+         {
+               if(this.veiled_in_black_volume > 0)
+               {
+                     this.veiled_in_black.volume = this.veiled_in_black_volume;
+                     this.veiled_in_black_volume = this.veiled_in_black_volume - 0.01;
+               }
+               if(this.veiled_in_black_volume <= 0 && this.fanfare_count == 0)
+               {
+                     this.veiled_in_black.pause();
+                     this.fanfare.play();
+                     this.fanfare_count = 1;
+               }
+         }    
       }
 
 
