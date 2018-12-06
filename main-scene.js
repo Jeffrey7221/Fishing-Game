@@ -222,7 +222,7 @@ class Fishing_Game extends Scene_Component
         this.pause = true;
         this.time = 0;            
            
-        this.beginning_animation = false;
+        this.beginning_animation = true;
         this.begin_animation = false;
         this.animation_t = 0;
         this.graphics_state = context.globals.graphics_state;
