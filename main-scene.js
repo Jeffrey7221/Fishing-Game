@@ -1378,9 +1378,6 @@ class Fishing_Game extends Scene_Component
                      this.fanfare.play();
                      this.fanfare_count = 1;
                }
-<<<<<<< HEAD
-               this.ending_animation = true;
-=======
                if(this.friedman_Fish_Matrix[0][3] == 20) {
                   this.friedman_Fish_Matrix[0][3] = 0;
                   this.friedman_Fish_Matrix[1][3] = 0;
@@ -1401,7 +1398,7 @@ class Fishing_Game extends Scene_Component
                 this.friedman_Fish_Matrix = friedman_model_transform;
              friedman_model_transform = friedman_model_transform.times( Mat4.rotation( this.friedman_angle, Vec.of(0, 0, 1)))
                this.shapes.plane.draw( graphics_state, friedman_model_transform, this.materials.friedman_Fish);
->>>>>>> 2201d50fc7d2b1df2785681e051ac74c4d9e86b5
+
          }    
       }
 
