@@ -39,6 +39,7 @@ class Fishing_Game extends Scene_Component
                          cylinder:  new Capped_Cylinder(20, 20),
                          tree_stem: new Shape_From_File( "assets/MapleTreeStem.obj" ),
                          tree_leaves: new Shape_From_File( "assets/MapleTreeLeaves.obj" ),
+                         grass:     new Shape_From_File( "assets/Grass_03.obj"),
                          rock:      new Shape_From_File( "assets/Rock.obj"),
                          circle:    new Circle(),
                        }
@@ -66,6 +67,14 @@ class Fishing_Game extends Scene_Component
 
         this.lights = [ new Light( Vec.of( 0, 5, 40, 1 ), Color.of( 250/255,214/255,165/255,1 ), 1000 ) ];
 
+        this.fanfare = new Audio("assets/Fanfare.flac");
+        this.menu = new Audio("assets/Menu.flac");
+        this.menu.loop = true;
+        this.menu_volume = 0.5;
+        this.veiled_in_black = new Audio("assets/Veiled in Black.flac");
+        this.veiled_in_black.loop = true;
+        this.veiled_in_black.volume = 0.5;
+
         this.crosshair_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
         this.sphere1_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
         this.sphere2_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
@@ -76,14 +85,14 @@ class Fishing_Game extends Scene_Component
         this.king_Fish_Matrix = Mat4.identity().times( Mat4.translation([0, 0, -0.15]));  
         this.king_angle = 0
         this.king_model_spawn = Mat4.identity().times( Mat4.scale([.2, .05, .2]));
-        this.king_spawn_time = Math.random() * 12 + 1;
+        this.king_spawn_time = Math.random() * 12 + 100;
         this.king_dist = 0.01;
         this.king_caught = false;
 
         this.mystery_Fish_Matrix = Mat4.identity().times( Mat4.translation([0, 0, -0.1])); 
         this.mystery_angle = 0;
         this.mystery_model_spawn = Mat4.identity().times( Mat4.scale([.2, .05, .2]));
-        this.mystery_spawn_time = Math.random() * 12 + 10;
+        this.mystery_spawn_time = Math.random() * 12 + 50;
         this.mystery_dist = 0.01;
         this.mystery_caught = false;
         this.mystery_direction = -1;
@@ -179,12 +188,17 @@ class Fishing_Game extends Scene_Component
                                           .times( Mat4.translation([-13, 5.5, -7 ]))
                                            .times( Mat4.scale([1.5, 1.5, 1.5]));
 
+        this.tree_Matrix2 = Mat4.identity();
+        this.tree_Matrix2 = this.tree_Matrix2.times( Mat4.rotation( 1.6, Vec.of( 1, 0, 0)))
+                                          .times( Mat4.translation([-15, 9, -5 ]))
+                                           .times( Mat4.scale([4, 4, 4]));
+
         this.tree_Matrix1 = this.tree_Matrix.times( Mat4.translation([21, 0, 0 ]))
                                             .times( Mat4.scale([1.5, 1.5, 1.5]));
 
         this.rock_Matrix = Mat4.identity().times( Mat4.rotation( 1.6, Vec.of( 0, 1, -.1)))
-                                          .times( Mat4.translation([ -1.6, -7, 11 ]))
-                                          .times (Mat4.scale([1.6, 1.6, 1.6]));
+                                          .times( Mat4.translation([ -0, -7, 11 ]))
+                                          .times (Mat4.scale([8, 2, 2]));
       
         this.catching = false;
         this.catching_timer = 0;  
@@ -278,6 +292,7 @@ class Fishing_Game extends Scene_Component
             this.king_caught = true;
             this.fish_is_caught = true;   
             this.caught_fish_material = this.materials.king_Fish;
+            this.fanfare.play();
             this.king_Fish_Matrix[0][0] = 0;this.king_Fish_Matrix[0][1] = -1;
             this.king_Fish_Matrix[1][0] = 1;this.king_Fish_Matrix[1][1] = 0;
             this.king_Fish_Matrix[2][0] = 1;this.king_Fish_Matrix[2][1] = 0;
@@ -289,7 +304,8 @@ class Fishing_Game extends Scene_Component
         {
             this.mystery_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.mystery_Fish
+            this.caught_fish_material = this.materials.mystery_Fish;
+            this.fanfare.play();
             this.mystery_Fish_Matrix[0][0] = 0;this.mystery_Fish_Matrix[0][1] = -1;
             this.mystery_Fish_Matrix[1][0] = 1;this.mystery_Fish_Matrix[1][1] = 0;
             this.mystery_Fish_Matrix[2][0] = 1;this.mystery_Fish_Matrix[2][1] = 0;
@@ -301,7 +317,8 @@ class Fishing_Game extends Scene_Component
         {
             this.plain_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.plain_Fish
+            this.caught_fish_material = this.materials.plain_Fish;
+            this.fanfare.play();
             this.plain_Fish_Matrix[0][0] = 0;this.plain_Fish_Matrix[0][1] = -1;
             this.plain_Fish_Matrix[1][0] = 1;this.plain_Fish_Matrix[1][1] = 0;
             this.plain_Fish_Matrix[2][0] = 1;this.plain_Fish_Matrix[2][1] = 0;
@@ -314,7 +331,8 @@ class Fishing_Game extends Scene_Component
         {
             this.plain1_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.plain_Fish
+            this.caught_fish_material = this.materials.plain_Fish;
+            this.fanfare.play();
             this.plain1_Fish_Matrix[0][0] = 0;this.plain1_Fish_Matrix[0][1] = -1;
             this.plain1_Fish_Matrix[1][0] = 1;this.plain1_Fish_Matrix[1][1] = 0;
             this.plain1_Fish_Matrix[2][0] = 1;this.plain1_Fish_Matrix[2][1] = 0;
@@ -327,7 +345,8 @@ class Fishing_Game extends Scene_Component
         {
             this.plain2_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.plain_Fish
+            this.caught_fish_material = this.materials.plain_Fish;
+            this.fanfare.play();
             this.plain2_Fish_Matrix[0][0] = 0;this.plain2_Fish_Matrix[0][1] = -1;
             this.plain2_Fish_Matrix[1][0] = 1;this.plain2_Fish_Matrix[1][1] = 0;
             this.plain2_Fish_Matrix[2][0] = 1;this.plain2_Fish_Matrix[2][1] = 0;
@@ -340,7 +359,8 @@ class Fishing_Game extends Scene_Component
         {
             this.fry_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.small_Fry
+            this.caught_fish_material = this.materials.small_Fry;
+            this.fanfare.play();
             this.small_Fry_Matrix[0][0] = 0;this.small_Fry_Matrix[0][1] = -1;
             this.small_Fry_Matrix[1][0] = 1;this.small_Fry_Matrix[1][1] = 0;
             this.small_Fry_Matrix[2][0] = 1;this.small_Fry_Matrix[2][1] = 0;
@@ -353,7 +373,8 @@ class Fishing_Game extends Scene_Component
         { 
             this.fry1_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.small_Fry
+            this.caught_fish_material = this.materials.small_Fry;
+            this.fanfare.play();
             this.small_Fry1_Matrix[0][0] = 0;this.small_Fry1_Matrix[0][1] = -1;
             this.small_Fry1_Matrix[1][0] = 1;this.small_Fry1_Matrix[1][1] = 0;
             this.small_Fry1_Matrix[2][0] = 1;this.small_Fry1_Matrix[2][1] = 0;
@@ -366,7 +387,8 @@ class Fishing_Game extends Scene_Component
         {
             this.fry2_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.small_Fry
+            this.caught_fish_material = this.materials.small_Fry;
+            this.fanfare.play();
             this.small_Fry2_Matrix[0][0] = 0;this.small_Fry2_Matrix[0][1] = -1;
             this.small_Fry2_Matrix[1][0] = 1;this.small_Fry2_Matrix[1][1] = 0;
             this.small_Fry2_Matrix[2][0] = 1;this.small_Fry2_Matrix[2][1] = 0;
@@ -379,7 +401,8 @@ class Fishing_Game extends Scene_Component
         {
             this.fry3_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.small_Fry
+            this.caught_fish_material = this.materials.small_Fry;
+            this.fanfare.play();
             this.small_Fry3_Matrix[0][0] = 0;this.small_Fry3_Matrix[0][1] = -1;
             this.small_Fry3_Matrix[1][0] = 1;this.small_Fry3_Matrix[1][1] = 0;
             this.small_Fry3_Matrix[2][0] = 1;this.small_Fry3_Matrix[2][1] = 0;
@@ -392,7 +415,8 @@ class Fishing_Game extends Scene_Component
         {
             this.fry4_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.small_Fry
+            this.caught_fish_material = this.materials.small_Fry;
+            this.fanfare.play();
             this.small_Fry4_Matrix[0][0] = 0;this.small_Fry4_Matrix[0][1] = -1;
             this.small_Fry4_Matrix[1][0] = 1;this.small_Fry4_Matrix[1][1] = 0;
             this.small_Fry4_Matrix[2][0] = 1;this.small_Fry4_Matrix[2][1] = 0;
@@ -405,7 +429,8 @@ class Fishing_Game extends Scene_Component
         {
             this.touchy_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.touchy_Fish
+            this.caught_fish_material = this.materials.touchy_Fish;
+            this.fanfare.play();
             this.touchy_Fish_Matrix[0][0] = 0;this.touchy_Fish_Matrix[0][1] = -1;
             this.touchy_Fish_Matrix[1][0] = 1;this.touchy_Fish_Matrix[1][1] = 0;
             this.touchy_Fish_Matrix[2][0] = 1;this.touchy_Fish_Matrix[2][1] = 0;
@@ -418,7 +443,8 @@ class Fishing_Game extends Scene_Component
         {
             this.nibbler_caught = true;
             this.fish_is_caught = true;   
-            this.caught_fish_material = this.materials.nibbler
+            this.caught_fish_material = this.materials.nibbler;
+            this.fanfare.play();
             this.nibbler_Matrix[0][0] = 0;this.nibbler_Matrix[0][1] = -1;
             this.nibbler_Matrix[1][0] = 1;this.nibbler_Matrix[1][1] = 0;
             this.nibbler_Matrix[2][0] = 1;this.nibbler_Matrix[2][1] = 0;
@@ -516,8 +542,22 @@ class Fishing_Game extends Scene_Component
               if(!this.begin_animation)
                   graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -5, 1030 ), Vec.of( 0, 100, 0 ), Vec.of( 0, 10, 0 ) );
               this.shapes.plane.draw(graphics_state, this.sign_Matrix, this.materials.start_sign);
+              this.menu.play();
               if(this.begin_animation)
+              {
                   this.trigger_animation(graphics_state)
+                  if(this.menu_volume > 0)
+                  {
+                        this.menu.volume = this.menu_volume;
+                        this.menu_volume = this.menu_volume - 0.01;
+                  }
+                  if(this.menu_volume <= 0)
+                  {
+                        this.menu.pause();
+                        this.veiled_in_black.play();
+                  }     
+              }
+                  
         }
 
         if(!this.beginning_animation) {
@@ -633,7 +673,7 @@ class Fishing_Game extends Scene_Component
 
       if(this.fish_is_caught) {
             this.caught_fish_animation(graphics_state, this.caught_fish_matrix, t);     
-      }    
+      }
 
         // Draw flattened blue sphere for temporary pond:
         this.shapes.pond.draw( graphics_state, this.pond_Matrix.times(Mat4.scale([1.05,1.05,1.05])), this.materials.pond);
@@ -692,8 +732,8 @@ class Fishing_Game extends Scene_Component
       draw_the_enviroment(graphics_state, t) {
             
            //  this.shapes.tree.draw( graphics_state, this.tree_Matrix, this.materials.tree);
-        this.shapes.tree_stem.draw( graphics_state, this.tree_Matrix, this.materials.tree_stem);
-        this.shapes.tree_leaves.draw( graphics_state, this.tree_Matrix, this.materials.tree_leaves);                               
+        this.shapes.tree_stem.draw( graphics_state, this.tree_Matrix2, this.materials.tree_stem);
+        this.shapes.tree_leaves.draw( graphics_state, this.tree_Matrix2, this.materials.tree_leaves);                               
 
            //  this.shapes.tree.draw( graphics_state, this.tree_Matrix, this.materials.tree);
         this.shapes.tree_stem.draw( graphics_state, this.tree_Matrix1, this.materials.tree_stem);
@@ -701,7 +741,79 @@ class Fishing_Game extends Scene_Component
 
         this.shapes.rock.draw( graphics_state, this.rock_Matrix, this.materials.rock);
         this.shapes.plane.draw( graphics_state, this.backdrop_Matrix, this.materials.pond.override( { color: Color.of( 147/255, 224/255, 1, 1), ambient: .8}));
-      
+
+        for(var i = -33; i < -2; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([10 + i/7 + 0.2 * Math.sin(0.5 * t),-3.5,i])).times(Mat4.scale([10,10,10])), this.materials.tree_leaves.override( { color: Color.of( .165,.298,0,1 )}));
+        }
+        for(var i = -34; i < -2; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([12 + i/5 + 0.2 * Math.sin(t),-3.5,i])).times(Mat4.scale([10,16,10])), this.materials.tree_leaves.override( { color: Color.of( .33,.60,0,1 )}));
+        }
+        for(var i = -35; i < -2; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([12 + i/5,-3.5,i])).times(Mat4.scale([10,9,10])), this.materials.tree_leaves.override( { color: Color.of( .67,.90,.40,1 )}));
+        }
+
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([10,-3.5,13])).times(Mat4.scale([10,10,10])), this.materials.tree_leaves.override( { color: Color.of( .165,.298,0,1 )}));
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([12,-3.5,13])).times(Mat4.scale([10,9,10])), this.materials.tree_leaves.override( { color: Color.of( .67,.90,.40,1 )}));
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([13,-3.5,13.5])).times(Mat4.scale([10,9,10])), this.materials.tree_leaves.override( { color: Color.of( .67,.90,.40,1 )}));
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([12,-3.5,13])).times(Mat4.scale([10,16,10])), this.materials.tree_leaves.override( { color: Color.of( .33,.60,0,1 )}));
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([11,-5,13])).times(Mat4.scale([10,16,10])), this.materials.tree_leaves.override( { color: Color.of( .33,.60,0,1 )}));
+        
+        for(var i = 14; i < 40; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([10 + i/7 + 0.2 * Math.sin(0.5 * t),-3.5,i])).times(Mat4.scale([10,10,10])), this.materials.tree_leaves.override( { color: Color.of( .165,.298,0,1 )}));
+        }
+        for(var i = 15; i < 40; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([12 + i/5 + 0.2 * Math.sin(t),-3.5,i])).times(Mat4.scale([10,16,10])), this.materials.tree_leaves.override( { color: Color.of( .33,.60,0,1 )}));
+        }
+        for(var i = 16; i < 40; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([12 + i/5,-3.5,i])).times(Mat4.scale([10,9,10])), this.materials.tree_leaves.override( { color: Color.of( .67,.90,.40,1 )}));
+        }
+        
+        for(var i = 0; i < 9; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([-5 + i,-3.5,-5 + i/5 + 0.2 * Math.sin(t)])).times(Mat4.scale([10,16,10])).times(Mat4.rotation(Math.PI/2, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .33,.60,0,1 )}));
+        }
+        for(var i = -1; i < 8; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([-5 + i,-3.5,-5 + i/7 + 0.2 * Math.sin(0.5* t)])).times(Mat4.scale([10,10,10])).times(Mat4.rotation(Math.PI/2, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .165,.298,0,1 )}));
+        }
+        for(var i = -2; i < 7; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([-5 + i,-3.5,-5 + i/5])).times(Mat4.scale([10,9,10])).times(Mat4.rotation(Math.PI/2, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .67,.90,.40,1 )}));
+        }
+        for(var i = 21.5; i < 36; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([-5 + i,-3.5,-5 + i/5 + 0.2 * Math.sin(t)])).times(Mat4.scale([10,16,10])).times(Mat4.rotation(Math.PI/2, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .33,.60,0,1 )}));
+        }
+        for(var i = 24; i < 36; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([-5 + i,-3.5,-5 + i/7 + 0.2 * Math.sin(0.5* t)])).times(Mat4.scale([10,10,10])).times(Mat4.rotation(Math.PI/2, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .165,.298,0,1 )}));
+        }
+        for(var i = 23; i < 36; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([-5 + i,-3.5,-5 + i/5])).times(Mat4.scale([10,9,10])).times(Mat4.rotation(Math.PI/2, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .67,.90,.40,1 )}));
+        }
+
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([2.5,-3.5, 0])).times(Mat4.scale([10,16,10])).times(Mat4.rotation(Math.PI/4, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .33,.60,0,1 )}));
+
+        for(var i = 2; i < 15; i+=3)
+        {
+              this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([2 - i,-3.5, 0 + i/5])).times(Mat4.scale([10,9,10])).times(Mat4.rotation(Math.PI/4, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .67,.90,.40,1 )}));
+        }
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([25,-3.5, 0])).times(Mat4.scale([10,16,10])).times(Mat4.rotation(Math.PI/4, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .33,.60,0,1 )}));
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([25,-3.5, 0])).times(Mat4.scale([10,9,10])).times(Mat4.rotation(Math.PI/4, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .67,.90,.40,1 )}));
+
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([15,-3.5, 0])).times(Mat4.scale([10,16,10])).times(Mat4.rotation(3 * Math.PI/4, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .33,.60,0,1 )}));
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([16,-3.5, 0])).times(Mat4.scale([10,9,10])).times(Mat4.rotation(3 * Math.PI/4, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .67,.90,.40,1 )}));
+
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([-7,-3.5, 0])).times(Mat4.scale([10,16,10])).times(Mat4.rotation(3 * Math.PI/4, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .33,.60,0,1 )}));
+        this.shapes.grass.draw( graphics_state, this.tree_Matrix.times(Mat4.translation([-8,-3.5, 0])).times(Mat4.scale([10,9,10])).times(Mat4.rotation(3 * Math.PI/4, Vec.of(0,1,0))), this.materials.tree_leaves.override( { color: Color.of( .67,.90,.40,1 )}));
+        
       }
 
          // *************************************************************************
