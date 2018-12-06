@@ -87,17 +87,17 @@ class Fishing_Game extends Scene_Component
         this.torus2_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
         this.cylinder_Matrix = Mat4.identity().times( Mat4.scale([1, 1, .1]));
 
-        this.king_Fish_Matrix = Mat4.identity().times( Mat4.translation([0, 0, -0.15]));  
+        this.king_Fish_Matrix = Mat4.identity().times( Mat4.translation([20, 20, -.15]));  
         this.king_angle = 0
         this.king_model_spawn = Mat4.identity().times( Mat4.scale([.2, .05, .2]));
-        this.king_spawn_time = Math.random() * 12 + 100;
+        this.king_spawn_time = Math.random() * 12 + 15;
         this.king_dist = 0.01;
         this.king_caught = false;
 
-        this.mystery_Fish_Matrix = Mat4.identity().times( Mat4.translation([0, 0, -0.1])); 
+        this.mystery_Fish_Matrix = Mat4.identity().times( Mat4.translation([20, 20, -0.1])); 
         this.mystery_angle = 0;
         this.mystery_model_spawn = Mat4.identity().times( Mat4.scale([.2, .05, .2]));
-        this.mystery_spawn_time = Math.random() * 12 + 50;
+        this.mystery_spawn_time = Math.random() * 12 + 10;
         this.mystery_dist = 0.01;
         this.mystery_caught = false;
         this.mystery_direction = -1;
@@ -160,7 +160,7 @@ class Fishing_Game extends Scene_Component
         this.touchy_dist = 0.01;
         this.touchy_caught = false;
 
-        this.nibbler_Matrix = Mat4.identity().times( Mat4.translation([0, 0, 0.15])).times(Mat4.scale([.5,.5,.5])); 
+        this.nibbler_Matrix = Mat4.identity().times( Mat4.translation([20, 20, 0.15])).times(Mat4.scale([.5,.5,.5])); 
         this.nibbler_angle = 0;
         this.nibbler_model_spawn = Mat4.identity().times( Mat4.scale([.05, .05, .05]));
         this.nibbler_spawn_time = Math.random() * 12 + 1;
@@ -210,6 +210,7 @@ class Fishing_Game extends Scene_Component
         this.zoom_animation = false;
         this.start_zoom = -1;
 
+        this.can_start_to_catch = false;
         this.fish_is_caught = false;
         this.caught_fish_material = null;
         this.caught_fish_matrix = null;
@@ -218,7 +219,7 @@ class Fishing_Game extends Scene_Component
         this.pause = true;
         this.time = 0;            
            
-        this.beginning_animation = true;
+        this.beginning_animation = false;
         this.begin_animation = false;
         this.animation_t = 0;
         this.graphics_state = context.globals.graphics_state;
@@ -236,10 +237,7 @@ class Fishing_Game extends Scene_Component
                                                                   this.begin_animation = true;
                                                                   this.t_reset = false;
                                                                 });
-        if(!this.catching)
-        {
-            this.key_triggered_button( "Catch Fish", [ ";" ], () => { if(!this.fish_is_caught) this.catch_fish() } );              
-        }
+        this.key_triggered_button( "Catch Fish", [ ";" ], () => { if(!this.fish_is_caught && !this.catching) this.catch_fish() } );              
 
 //         this.result_img = this.control_panel.appendChild( Object.assign( document.createElement( "img" ), 
 //                 { style:"width:200px; height:" + 200 * this.aspect_ratio + "px" } ) );
@@ -533,10 +531,10 @@ class Fishing_Game extends Scene_Component
         const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;  
         this.time = t;
         if(this.beginning_animation) {
+              this.menu.play();
               if(!this.begin_animation)
                   graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -5, 1030 ), Vec.of( 0, 100, 0 ), Vec.of( 0, 10, 0 ) );
               this.shapes.plane.draw(graphics_state, this.sign_Matrix, this.materials.start_sign);
-              this.menu.play();
               if(this.begin_animation)
               {
                   this.trigger_animation(graphics_state)
@@ -839,6 +837,7 @@ class Fishing_Game extends Scene_Component
                   }
               }
               this.shapes.plane.draw( graphics_state, this.king_model_spawn, this.materials.king_Fish);
+              this.king_Fish_Matrix[0][3] = 0; this.king_Fish_Matrix[1][3] = 0;
             }
 
             if(t > this.king_spawn_time + 0.2)
@@ -893,6 +892,7 @@ class Fishing_Game extends Scene_Component
                               }
                         }
                         this.shapes.plane.draw( graphics_state, this.mystery_model_spawn, this.materials.mystery_Fish);
+                        this.mystery_Fish_Matrix[0][3] = 0; this.mystery_Fish_Matrix[1][3] = 0;
                   }
 
                   if(t > this.mystery_spawn_time + 0.2)
@@ -1301,6 +1301,7 @@ class Fishing_Game extends Scene_Component
                   }
               }
               this.shapes.plane.draw( graphics_state, this.nibbler_model_spawn, this.materials.nibbler);
+              this.nibbler_Matrix[0][3] = 0; this.nibbler_Matrix[1][3] = 0;
             }
 
             if(t > this.nibbler_spawn_time + 0.2)
