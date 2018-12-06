@@ -62,6 +62,7 @@ class Fishing_Game extends Scene_Component
             nibbler:        context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/Nibbler.png", false ) } ),
             friedman_Fish:       context.get_instance( Phong_Shader ).material( Color.of(0,0,0,1), { ambient: 1, texture: context.get_instance( "assets/friedman.jpeg", false ) } ),
             start_sign:           context.get_instance( Fake_Bump_Map ).material( Color.of( 0, 0, 0,1 ), { ambient: .8, diffusivity: .5, specularity: .5 , texture: context.get_instance( "assets/start_sign.jpg", false )  } ),
+            end_sign:           context.get_instance( Fake_Bump_Map ).material( Color.of( 0, 0, 0,1 ), { ambient: .8, diffusivity: .5, specularity: .5 , texture: context.get_instance( "assets/end_game.jpg", false )  } ),
             tree_leaves:    context.get_instance( Fake_Bump_Map ).material( Color.of( 0,.6,0,1 ), { ambient: .7, diffusivity: .5, specularity: .5 } ),
             tree_stem:      context.get_instance( Fake_Bump_Map ).material( Color.of( 70/255, 50/255, 5/255,1 ), { ambient: .9, diffusivity: .5, specularity: .5 } ),
             rock:           context.get_instance( Fake_Bump_Map ).material( Color.of( 86/255, 64/255, 29/255,1 ), { ambient: .5, diffusivity: 5, specularity: .5 , texture: context.get_instance( "assets/rock_tex.jpg", false )  } ),
@@ -229,6 +230,7 @@ class Fishing_Game extends Scene_Component
         this.pause = true;
         this.time = 0;            
            
+        this.ending_animation = false;
         this.beginning_animation = true;
         this.begin_animation = false;
         this.animation_t = 0;
@@ -572,7 +574,7 @@ class Fishing_Game extends Scene_Component
         graphics_state.lights = this.lights;        
         const t = graphics_state.animation_time / 1000, dt = graphics_state.animation_delta_time / 1000;  
         this.time = t;
-        if(this.beginning_animation) {
+        if(this.beginning_animation && !this.ending_animation) {
               this.menu.play();
               if(!this.begin_animation)
                   graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -5, 1030 ), Vec.of( 0, 100, 0 ), Vec.of( 0, 10, 0 ) );
@@ -593,7 +595,12 @@ class Fishing_Game extends Scene_Component
               }    
         }
 
-        if(!this.beginning_animation) {
+        if(!this.beginning_animation && this.ending_animation) {
+              graphics_state.camera_transform = Mat4.look_at( Vec.of( 0, -5, 1030 ), Vec.of( 0, 100, 0 ), Vec.of( 0, 10, 0 ) );
+              this.shapes.plane.draw(graphics_state, this.sign_Matrix, this.materials.end_sign);
+        }
+
+        if(!this.beginning_animation && !this.ending_animation) {
               // ***************************** Shadow Map *********************************
               // Helper function to draw the fish - Scene 1
               graphics_state.camera_transform =  Mat4.look_at( Vec.of( 0,5,40,1), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
@@ -1371,6 +1378,9 @@ class Fishing_Game extends Scene_Component
                      this.fanfare.play();
                      this.fanfare_count = 1;
                }
+<<<<<<< HEAD
+               this.ending_animation = true;
+=======
                if(this.friedman_Fish_Matrix[0][3] == 20) {
                   this.friedman_Fish_Matrix[0][3] = 0;
                   this.friedman_Fish_Matrix[1][3] = 0;
@@ -1391,6 +1401,7 @@ class Fishing_Game extends Scene_Component
                 this.friedman_Fish_Matrix = friedman_model_transform;
              friedman_model_transform = friedman_model_transform.times( Mat4.rotation( this.friedman_angle, Vec.of(0, 0, 1)))
                this.shapes.plane.draw( graphics_state, friedman_model_transform, this.materials.friedman_Fish);
+>>>>>>> 2201d50fc7d2b1df2785681e051ac74c4d9e86b5
          }    
       }
 
