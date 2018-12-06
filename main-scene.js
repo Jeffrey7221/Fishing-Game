@@ -42,8 +42,10 @@ class Fishing_Game extends Scene_Component
                          grass:     new Shape_From_File( "assets/Grass_03.obj"),
                          rock:      new Shape_From_File( "assets/Rock.obj"),
                          circle:    new Circle(),
+                         mText:      new Text_Line(35),
                        }
         this.submit_shapes( context, shapes );
+        this.shapes.mText.set_string("Nice!");
 
         this.materials =     
           { pond:          context.get_instance( Phong_Shader ).material( Color.of( 0, 123/255, 167/255, .5 ), { ambient: 0.3} ),
@@ -63,6 +65,7 @@ class Fishing_Game extends Scene_Component
             tree_leaves:    context.get_instance( Fake_Bump_Map ).material( Color.of( 0,.6,0,1 ), { ambient: .7, diffusivity: .5, specularity: .5 } ),
             tree_stem:      context.get_instance( Fake_Bump_Map ).material( Color.of( 70/255, 50/255, 5/255,1 ), { ambient: .9, diffusivity: .5, specularity: .5 } ),
             rock:           context.get_instance( Fake_Bump_Map ).material( Color.of( 86/255, 64/255, 29/255,1 ), { ambient: .5, diffusivity: 5, specularity: .5 , texture: context.get_instance( "assets/rock_tex.jpg", false )  } ),
+            text_image:        context.get_instance( Phong_Shader ).material( Color.of( 0,0,0,1 ), { ambient: 1, diffusivity: 0, specularity: 0, texture: context.get_instance( "/assets/text.png", false ) } ),
           }
 
         this.lights = [ new Light( Vec.of( 0, 5, 40, 1 ), Color.of( 250/255,214/255,165/255,1 ), 1000 ) ];
@@ -701,6 +704,8 @@ class Fishing_Game extends Scene_Component
                   }
                   this.caught_fish_camera(graphics_state, fish_matrix, t);
             }
+
+            this.shapes.mText.draw( graphics_state, fish_matrix.times(Mat4.rotation(3 * Math.PI/2, [0, 0, 1])).times(Mat4.translation([2,0,0])), this.materials.text_image );
       }
        caught_fish_camera(graphics_state, fish_matrix, t) {
             if((t - this.start_zoom) <=  3) {
