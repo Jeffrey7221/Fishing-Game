@@ -11,7 +11,7 @@ Fishing Game
 ## Description:
 Our project is a fishing game where the player is able to catch randomly moving fish inside of a pond.  The controls are the 
 "i" "j" "k" "l" keys to move the bob, and the ";" to catch.
-Hosted on (https://jeffrey7221.github.io.)
+Hosted on on [this site](http://bzhu.me/fishing.html)
 
 ## Individual Contributions:
 ### Tian Ye:
